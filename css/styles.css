@@ -1,28 +1,44 @@
 /* ============================================================
-   CSS Variables & Reset
+   CSS Variables — Light theme (default)
    ============================================================ */
 :root {
+  --bg:          #f1f5f9;
+  --surface:     #ffffff;
+  --card:        #f8fafc;
+  --card-hover:  #f1f5f9;
+  --border:      #e2e8f0;
+  --primary:     #1C6A51;
+  --primary-h:   #17553f;
+  --primary-dim: #dcfce7;
+  --danger:      #dc2626;
+  --danger-h:    #b91c1c;
+  --warn:        #d97706;
+  --ok:          #16a34a;
+  --text:        #1e293b;
+  --text-muted:  #64748b;
+  --text-dim:    #475569;
+  --radius:      8px;
+  --radius-lg:   12px;
+  --shadow:      0 4px 24px rgba(0,0,0,.08);
+  --transition:  .18s ease;
+  --sidebar-w:   220px;
+  --font:        'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Dark theme overrides */
+[data-theme="dark"] {
   --bg:          #0f1117;
   --surface:     #171c27;
   --card:        #1e2435;
   --card-hover:  #242b3d;
   --border:      #2a3147;
-  --primary:     #1C6A51;
-  --primary-h:   #21815f;
   --primary-dim: #143f30;
   --danger:      #c0392b;
   --danger-h:    #e74c3c;
-  --warn:        #d97706;
-  --ok:          #16a34a;
   --text:        #e2e8f0;
   --text-muted:  #64748b;
   --text-dim:    #94a3b8;
-  --radius:      8px;
-  --radius-lg:   12px;
   --shadow:      0 4px 24px rgba(0,0,0,.4);
-  --transition:  .18s ease;
-  --sidebar-w:   220px;
-  --font:        'Inter', system-ui, -apple-system, sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -452,13 +468,22 @@ a:hover { color: var(--primary-h); }
   white-space: nowrap;
 }
 
-.badge-green  { background: #14532d; color: #4ade80; }
-.badge-yellow { background: #78350f; color: #fbbf24; }
-.badge-red    { background: #7f1d1d; color: #f87171; }
-.badge-blue   { background: #1e3a5f; color: #60a5fa; }
-.badge-purple { background: #3b0764; color: #c084fc; }
-.badge-gray   { background: #1e293b; color: #94a3b8; }
+/* Light badge defaults */
+.badge-green  { background: #dcfce7; color: #166534; }
+.badge-yellow { background: #fef9c3; color: #854d0e; }
+.badge-red    { background: #fee2e2; color: #991b1b; }
+.badge-blue   { background: #dbeafe; color: #1e40af; }
+.badge-purple { background: #f3e8ff; color: #7e22ce; }
+.badge-gray   { background: #f1f5f9; color: #475569; }
 .badge-teal   { background: var(--primary-dim); color: var(--primary-h); }
+
+/* Dark badge overrides */
+[data-theme="dark"] .badge-green  { background: #14532d; color: #4ade80; }
+[data-theme="dark"] .badge-yellow { background: #78350f; color: #fbbf24; }
+[data-theme="dark"] .badge-red    { background: #7f1d1d; color: #f87171; }
+[data-theme="dark"] .badge-blue   { background: #1e3a5f; color: #60a5fa; }
+[data-theme="dark"] .badge-purple { background: #3b0764; color: #c084fc; }
+[data-theme="dark"] .badge-gray   { background: #1e293b; color: #94a3b8; }
 
 /* ============================================================
    Table
@@ -600,8 +625,10 @@ tbody td {
   margin-bottom: 1rem;
 }
 
-.alert-error { background: #7f1d1d33; border: 1px solid #991b1b; color: #fca5a5; }
-.alert-success { background: #14532d33; border: 1px solid #166534; color: #86efac; }
+.alert-error   { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; }
+.alert-success { background: #dcfce7; border: 1px solid #86efac; color: #166534; }
+[data-theme="dark"] .alert-error   { background: #7f1d1d33; border-color: #991b1b; color: #fca5a5; }
+[data-theme="dark"] .alert-success { background: #14532d33; border-color: #166534; color: #86efac; }
 
 .toast-container {
   position: fixed;
@@ -702,30 +729,37 @@ tbody td {
    Responsive
    ============================================================ */
 @media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-  }
-  .sidebar.open {
-    transform: translateX(0);
-  }
-  .sidebar-backdrop.open {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-backdrop.open { display: block; }
+  .main-content { margin-left: 0; }
+  .hamburger { display: block; }
+  .form-row, .form-row-3 { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .page-content { padding: 1rem; }
+
+  /* Tables → card layout on mobile */
+  .table-wrapper { border: none; background: transparent; }
+  .table-wrapper table { display: block; }
+  .table-wrapper thead { display: none; }
+  .table-wrapper tbody { display: flex; flex-direction: column; gap: .6rem; }
+  .table-wrapper tbody tr {
     display: block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: .85rem 1rem;
   }
-  .main-content {
-    margin-left: 0;
+  .table-wrapper tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .25rem 0;
+    border: none;
+    font-size: .875rem;
   }
-  .hamburger {
-    display: block;
-  }
-  .form-row, .form-row-3 {
-    grid-template-columns: 1fr;
-  }
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .page-content {
-    padding: 1rem;
-  }
+  .table-wrapper tbody td:first-child { font-weight: 600; }
+  .table-wrapper tbody td .actions { justify-content: flex-end; width: 100%; }
 }
 
 /* ============================================================
@@ -735,6 +769,25 @@ tbody td {
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Theme toggle button */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: .6rem .75rem;
+  border-radius: var(--radius);
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: .8rem;
+  font-family: var(--font);
+  cursor: pointer;
+  margin-bottom: .5rem;
+  transition: var(--transition);
+}
+.theme-toggle:hover { background: var(--card); color: var(--text); }
 
 /* ============================================================
    Misc utils

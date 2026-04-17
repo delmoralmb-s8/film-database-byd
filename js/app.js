@@ -120,10 +120,41 @@ const App = (() => {
 })();
 
 // ============================================================
+// Theme
+// ============================================================
+
+const Theme = (() => {
+  function apply(dark) {
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    document.getElementById('theme-label').textContent = dark ? 'Modo claro' : 'Modo oscuro';
+    document.getElementById('theme-icon').textContent  = dark ? '☀️' : '🌙';
+  }
+
+  function init() {
+    const saved = localStorage.getItem('theme');
+    apply(saved === 'dark');
+  }
+
+  function toggle() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    apply(!isDark);
+  }
+
+  function bindUI() {
+    document.getElementById('btn-theme').addEventListener('click', toggle);
+  }
+
+  return { init, bindUI };
+})();
+
+// ============================================================
 // Bootstrap
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+  Theme.init();
+  Theme.bindUI();
   Modal.bindUI();
   App.bindUI();
   Cameras.bindUI();
