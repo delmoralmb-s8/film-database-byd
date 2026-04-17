@@ -279,18 +279,13 @@ const Films = (() => {
           </div>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>ISO</label>
-          <input id="f-iso" type="number" value="${v('iso')}" placeholder="400">
-        </div>
-        <div class="form-group">
-          <label>Nº fotos</label>
-          <select id="f-num-photos">
-            <option value="">—</option>
-            ${sel([['12','12'],['24','24'],['36','36']], v('num_photos'))}
-          </select>
-        </div>
+      <input id="f-iso" type="hidden" value="${v('iso')}">
+      <div class="form-group">
+        <label>Nº fotos</label>
+        <select id="f-num-photos">
+          <option value="">—</option>
+          ${sel([['12','12'],['24','24'],['36','36']], v('num_photos'))}
+        </select>
       </div>
       <div class="form-row">
         <div class="form-group">
