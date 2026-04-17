@@ -84,6 +84,9 @@
       <button class="nav-link" data-view="lenses">
         <span class="nav-icon">&#128300;</span> Lentes
       </button>
+      <button id="btn-add-film" class="btn btn-primary" style="margin-top:.75rem;width:100%;justify-content:center">
+        + Agregar nuevo rollo
+      </button>
     </div>
     <div class="sidebar-footer">
       <div id="user-email" class="user-info"></div>
@@ -138,6 +141,10 @@
             <div id="stat-lenses" class="stat-value">0</div>
           </div>
         </div>
+
+        <button id="btn-add-film-dash" class="btn btn-primary" style="width:100%;justify-content:center;padding:.85rem;font-size:1rem;margin-bottom:1.5rem">
+          + Agregar nuevo rollo
+        </button>
 
         <div>
           <div class="section-title" style="margin-bottom:.5rem">Rollos en cámara</div>
@@ -229,6 +236,26 @@
 
     </div><!-- /page-content -->
   </div><!-- /main-content -->
+
+  <!-- Bottom nav (mobile only) -->
+  <nav id="bottom-nav" class="bottom-nav">
+    <button class="bottom-nav-item active" data-view="dashboard">
+      <span>&#128202;</span>Panel
+    </button>
+    <button class="bottom-nav-item" data-view="films">
+      <span>&#127926;</span>Rollos
+    </button>
+    <button class="bottom-nav-item bottom-nav-add" id="btn-add-film-mobile">
+      <span class="bottom-nav-plus">+</span>Nuevo
+    </button>
+    <button class="bottom-nav-item" data-view="cameras">
+      <span>&#128247;</span>Cámaras
+    </button>
+    <button class="bottom-nav-item" data-view="lenses">
+      <span>&#128300;</span>Lentes
+    </button>
+  </nav>
+
 </div><!-- /app-screen -->
 
 <!-- ============================================================

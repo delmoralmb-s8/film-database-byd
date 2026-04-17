@@ -732,11 +732,12 @@ tbody td {
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
   .sidebar-backdrop.open { display: block; }
-  .main-content { margin-left: 0; }
+  .main-content { margin-left: 0; padding-bottom: 72px; }
   .hamburger { display: block; }
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .page-content { padding: 1rem; }
+  .bottom-nav { display: flex; }
 
   /* Tables → card layout on mobile */
   .table-wrapper { border: none; background: transparent; }
@@ -769,6 +770,59 @@ tbody td {
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ============================================================
+   Bottom nav (mobile)
+   ============================================================ */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: .55rem .25rem;
+  font-size: .65rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: color var(--transition);
+}
+
+.bottom-nav-item span:first-child { font-size: 1.25rem; line-height: 1; }
+.bottom-nav-item.active { color: var(--primary); }
+
+.bottom-nav-add {
+  position: relative;
+}
+
+.bottom-nav-plus {
+  width: 2.4rem;
+  height: 2.4rem;
+  background: var(--primary);
+  color: #fff !important;
+  border-radius: 50%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem !important;
+  font-weight: 300;
+  line-height: 1;
+  margin-bottom: 1px;
+}
 
 /* Theme toggle button */
 .theme-toggle {

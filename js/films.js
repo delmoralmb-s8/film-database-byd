@@ -166,22 +166,78 @@ const Films = (() => {
     'Vision3 50D', 'Vision3 200T', 'Vision3 500T', 'Ektachrome', 'Tri-X Reversal',
   ];
 
-  function updateStockList() {
-    const brand  = document.getElementById('f-brand')?.value;
-    const format = document.getElementById('f-format')?.value;
-    const dl     = document.getElementById('film-stocks-list');
-    if (!dl) return;
+  // Rebuild brand options (Super8 restricts to Kodak/Orwo)
+  function onFormatChange() {
+    const format      = document.getElementById('f-format')?.value;
+    const brandSelect = document.getElementById('f-brand');
+    if (!brandSelect) return;
+    const list = format === 'Super8' ? ['Kodak','Orwo'] : FILM_BRANDS;
+    brandSelect.innerHTML = list.map(b =>
+      `<option value="${b}">${b}</option>`
+    ).join('');
+    brandSelect.value = format === 'Super8' ? 'Kodak' : (list[0] || '');
+    onBrandChange();
+  }
+
+  // Rebuild emulsion select based on brand + format
+  function onBrandChange() {
+    const brand      = document.getElementById('f-brand')?.value;
+    const format     = document.getElementById('f-format')?.value;
+    const nameSelect = document.getElementById('f-name');
+    if (!nameSelect) return;
     const stocks = format === 'Super8' ? SUPER8_STOCKS : (FILM_STOCKS[brand] || []);
-    dl.innerHTML = stocks.map(s => `<option value="${s}">`).join('');
+    nameSelect.innerHTML =
+      `<option value="">— Seleccionar —</option>` +
+      stocks.map(s => `<option value="${s}">${s}</option>`).join('') +
+      `<option value="__otro__">Otro (escribir)</option>`;
+    if (stocks.length) { nameSelect.value = stocks[0]; onNameChange(); }
+  }
+
+  // Show custom input when "Otro", auto-fill ISO from emulsion name
+  function onNameChange() {
+    const val       = document.getElementById('f-name')?.value;
+    const customWrap = document.getElementById('f-name-custom-wrap');
+    const isoField  = document.getElementById('f-iso');
+    customWrap?.classList.toggle('hidden', val !== '__otro__');
+    if (val && val !== '__otro__' && isoField) {
+      const m = val.match(/\b(50|100|125|160|200|250|320|400|500|800|1600|3200)\b/);
+      if (m) isoField.value = m[1];
+    }
   }
 
   // ---- Modal form HTML ----
 
   function formHtml(film, cameras, lenses) {
+    const isNew = !film;
     const v = (id, fallback = '') => film?.[id] ?? fallback;
     const sel = (opts, current) => opts.map(([val, lbl]) =>
       `<option value="${val}" ${current === val ? 'selected' : ''}>${lbl}</option>`
     ).join('');
+
+    const today = new Date().toISOString().split('T')[0];
+
+    // Smart defaults for new rolls
+    const defCameraId = isNew
+      ? (cameras.find(c => /nikon/i.test(c.brand) && /f3/i.test(c.model))?.id ?? '')
+      : v('camera_id');
+    const defLensId = isNew
+      ? (lenses.find(l => /nikkor/i.test(l.brand) && /50/.test(l.focal_length))?.id ?? '')
+      : v('lens_id');
+    const defStart   = isNew ? today   : v('start_date');
+    const defEnd     = isNew ? today   : v('end_date');
+    const defCountry = isNew ? 'Mexico': v('country');
+    const defCity    = isNew ? 'CDMX'  : v('city');
+
+    // Brand list respects Super8 restriction
+    const currentFormat = v('format', '35mm');
+    const brandList = currentFormat === 'Super8' ? ['Kodak','Orwo'] : FILM_BRANDS;
+    const currentBrand = v('brand', brandList[0] || '');
+
+    // Emulsion select
+    const stocks = currentFormat === 'Super8' ? SUPER8_STOCKS : (FILM_STOCKS[currentBrand] || []);
+    const currentName = v('name');
+    const nameIsCustom = currentName && !stocks.includes(currentName);
+    const selectValue = nameIsCustom ? '__otro__' : (currentName || (stocks[0] || ''));
 
     return `
       <div class="form-row-3">
@@ -199,24 +255,28 @@ const Films = (() => {
         </div>
         <div class="form-group">
           <label>Formato</label>
-          <select id="f-format" onchange="Films.updateStockList()">
-            ${sel([['35mm','35mm'],['120','120'],['Super8','Super 8']], v('format','35mm'))}
+          <select id="f-format" onchange="Films.onFormatChange()">
+            ${sel([['35mm','35mm'],['120','120'],['Super8','Super 8']], currentFormat)}
           </select>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>Marca</label>
-          <select id="f-brand" onchange="Films.updateStockList()">
-            <option value="">— Seleccionar —</option>
-            ${FILM_BRANDS.map(b => `<option value="${b}" ${v('brand') === b ? 'selected' : ''}>${b}</option>`).join('')}
+          <select id="f-brand" onchange="Films.onBrandChange()">
+            ${brandList.map(b => `<option value="${b}" ${currentBrand === b ? 'selected' : ''}>${b}</option>`).join('')}
           </select>
         </div>
         <div class="form-group">
           <label>Nombre / Emulsión</label>
-          <input id="f-name" list="film-stocks-list" value="${v('name')}"
-            placeholder="Selecciona o escribe…" autocomplete="off">
-          <datalist id="film-stocks-list"></datalist>
+          <select id="f-name" onchange="Films.onNameChange()">
+            <option value="">— Seleccionar —</option>
+            ${stocks.map(s => `<option value="${s}" ${selectValue === s ? 'selected' : ''}>${s}</option>`).join('')}
+            <option value="__otro__" ${selectValue === '__otro__' ? 'selected' : ''}>Otro (escribir)</option>
+          </select>
+          <div id="f-name-custom-wrap" class="${nameIsCustom ? '' : 'hidden'}" style="margin-top:.4rem">
+            <input id="f-name-custom" value="${nameIsCustom ? currentName : ''}" placeholder="Escribe la emulsión…">
+          </div>
         </div>
       </div>
       <div class="form-row">
@@ -237,14 +297,14 @@ const Films = (() => {
           <label>Cámara</label>
           <select id="f-camera">
             <option value="">— Sin cámara —</option>
-            ${cameras.map(c => `<option value="${c.id}" ${v('camera_id') === c.id ? 'selected' : ''}>${c.brand} ${c.model}</option>`).join('')}
+            ${cameras.map(c => `<option value="${c.id}" ${defCameraId === c.id ? 'selected' : ''}>${c.brand} ${c.model}</option>`).join('')}
           </select>
         </div>
         <div class="form-group">
           <label>Lente</label>
           <select id="f-lens">
             <option value="">— Sin lente —</option>
-            ${lenses.map(l => `<option value="${l.id}" ${v('lens_id') === l.id ? 'selected' : ''}>${l.brand} ${l.focal_length}mm</option>`).join('')}
+            ${lenses.map(l => `<option value="${l.id}" ${defLensId === l.id ? 'selected' : ''}>${l.brand} ${l.focal_length}mm</option>`).join('')}
           </select>
         </div>
       </div>
@@ -253,35 +313,26 @@ const Films = (() => {
           <label>Estado actual</label>
           <select id="f-status">
             ${sel([
-              ['en_camara','En cámara'],
-              ['en_revelado','En revelado'],
-              ['finalizado','Finalizado'],
-              ['escaneado','Escaneado']
+              ['en_camara','En cámara'],['en_revelado','En revelado'],
+              ['finalizado','Finalizado'],['escaneado','Escaneado']
             ], v('current_status','en_camara'))}
           </select>
         </div>
         <div class="form-group">
           <label>Forzado</label>
           <select id="f-push-pull">
-            ${sel([
-              ['no','No'],
-              ['+1','+1 paso'],
-              ['+2','+2 pasos'],
-              ['+3','+3 pasos'],
-              ['-1','-1 paso'],
-              ['-2','-2 pasos']
-            ], v('push_pull','no'))}
+            ${sel([['no','No'],['+1','+1 paso'],['+2','+2 pasos'],['+3','+3 pasos'],['-1','-1 paso'],['-2','-2 pasos']], v('push_pull','no'))}
           </select>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>Fecha inicio</label>
-          <input id="f-start" type="date" value="${v('start_date')}">
+          <input id="f-start" type="date" value="${defStart}">
         </div>
         <div class="form-group">
           <label>Fecha fin</label>
-          <input id="f-end" type="date" value="${v('end_date')}">
+          <input id="f-end" type="date" value="${defEnd}">
         </div>
       </div>
       <div class="form-group">
@@ -294,11 +345,11 @@ const Films = (() => {
       <div class="form-row">
         <div class="form-group">
           <label>Ciudad</label>
-          <input id="f-city" value="${v('city')}" placeholder="Ciudad">
+          <input id="f-city" value="${defCity}" placeholder="Ciudad">
         </div>
         <div class="form-group">
           <label>País</label>
-          <input id="f-country" value="${v('country')}" placeholder="País">
+          <input id="f-country" value="${defCountry}" placeholder="País">
         </div>
       </div>
       <div class="form-group">
@@ -319,11 +370,15 @@ const Films = (() => {
   }
 
   function collectForm(film) {
+    const rawName = document.getElementById('f-name')?.value;
+    const name = rawName === '__otro__'
+      ? document.getElementById('f-name-custom')?.value.trim()
+      : rawName;
     return {
       id:             film?.id,
       film_status:    document.getElementById('f-film-status').value,
       brand:          document.getElementById('f-brand').value,
-      name:           document.getElementById('f-name').value.trim(),
+      name,
       type:           document.getElementById('f-type').value,
       iso:            document.getElementById('f-iso').value,
       format:         document.getElementById('f-format').value,
@@ -426,8 +481,8 @@ const Films = (() => {
         return true;
       }
     });
-    // Populate datalist for the pre-selected brand (edit mode)
-    setTimeout(updateStockList, 0);
+    // Trigger ISO auto-fill for pre-selected emulsion
+    setTimeout(onNameChange, 0);
   }
 
   function openEdit(id) {
@@ -437,6 +492,8 @@ const Films = (() => {
 
   function bindUI() {
     document.getElementById('btn-add-film')?.addEventListener('click', () => openModal());
+    document.getElementById('btn-add-film-mobile')?.addEventListener('click', () => openModal());
+    document.getElementById('btn-add-film-dash')?.addEventListener('click', () => openModal());
 
     ['filter-status','filter-type','filter-format'].forEach(id => {
       document.getElementById(id)?.addEventListener('change', () => render());
@@ -446,7 +503,7 @@ const Films = (() => {
 
   return {
     load, getAll, save, render, openModal, openEdit, bindUI,
-    updateStockList,
+    onFormatChange, onBrandChange, onNameChange,
     STATUS_CONFIG, FILM_STATUS_CFG, statusBadge, filmStatusBadge
   };
 })();

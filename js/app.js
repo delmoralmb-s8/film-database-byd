@@ -71,7 +71,7 @@ const App = (() => {
     views.forEach(v => {
       document.getElementById(`${v}-view`).classList.toggle('active', v === view);
     });
-    document.querySelectorAll('.nav-link').forEach(link => {
+    document.querySelectorAll('.nav-link, .bottom-nav-item[data-view]').forEach(link => {
       link.classList.toggle('active', link.dataset.view === view);
     });
     document.getElementById('page-title').textContent = {
@@ -101,7 +101,7 @@ const App = (() => {
   }
 
   function bindUI() {
-    document.querySelectorAll('.nav-link').forEach(link => {
+    document.querySelectorAll('.nav-link, .bottom-nav-item[data-view]').forEach(link => {
       link.addEventListener('click', () => navigate(link.dataset.view));
     });
 
