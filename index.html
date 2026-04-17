@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Film Database</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ============================================================
+     AUTH SCREEN
+     ============================================================ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <h1>&#127926; Film Database</h1>
+      <p>Seguimiento de rollos analógicos</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Iniciar sesión</button>
+      <button class="auth-tab" data-tab="register">Registrarse</button>
+    </div>
+
+    <!-- Login form -->
+    <form id="form-login" class="auth-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input id="login-email" type="email" placeholder="tu@email.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input id="login-pass" type="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <div id="login-error" class="alert alert-error hidden"></div>
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:.5rem">Entrar</button>
+    </form>
+
+    <!-- Register form -->
+    <form id="form-register" class="auth-form hidden">
+      <div class="form-group">
+        <label>Email</label>
+        <input id="reg-email" type="email" placeholder="tu@email.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input id="reg-pass" type="password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label>Confirmar contraseña</label>
+        <input id="reg-pass2" type="password" placeholder="Repite la contraseña" required autocomplete="new-password">
+      </div>
+      <div id="reg-error" class="alert alert-error hidden"></div>
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:.5rem">Crear cuenta</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     APP SCREEN
+     ============================================================ -->
+<div id="app-screen" class="hidden">
+
+  <!-- Sidebar -->
+  <nav id="sidebar" class="sidebar">
+    <div class="sidebar-logo">
+      <h2>&#127926; Film DB</h2>
+      <span>Analógico</span>
+    </div>
+    <div class="sidebar-nav">
+      <button class="nav-link active" data-view="dashboard">
+        <span class="nav-icon">&#128202;</span> Panel
+      </button>
+      <button class="nav-link" data-view="films">
+        <span class="nav-icon">&#127926;</span> Rollos
+      </button>
+      <button class="nav-link" data-view="cameras">
+        <span class="nav-icon">&#128247;</span> Cámaras
+      </button>
+      <button class="nav-link" data-view="lenses">
+        <span class="nav-icon">&#128300;</span> Lentes
+      </button>
+    </div>
+    <div class="sidebar-footer">
+      <div id="user-email" class="user-info"></div>
+      <button id="btn-logout" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center">
+        Cerrar sesión
+      </button>
+    </div>
+  </nav>
+
+  <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <header class="top-bar">
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <button id="hamburger" class="hamburger" aria-label="Menú">&#9776;</button>
+        <h1 id="page-title">Panel de control</h1>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- ==================== DASHBOARD ==================== -->
+      <section id="dashboard-view" class="view active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total rollos</div>
+            <div id="stat-total" class="stat-value">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">En cámara</div>
+            <div id="stat-in-cam" class="stat-value">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">En revelado</div>
+            <div id="stat-in-dev" class="stat-value">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Escaneados</div>
+            <div id="stat-scanned" class="stat-value">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Cámaras</div>
+            <div id="stat-cameras" class="stat-value">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Lentes</div>
+            <div id="stat-lenses" class="stat-value">0</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-title" style="margin-bottom:.5rem">Rollos en cámara</div>
+          <div id="dash-in-cam"></div>
+        </div>
+
+        <div class="mt-2">
+          <div class="section-title" style="margin-bottom:.5rem">Rollos rancios</div>
+          <div id="dash-rancio"></div>
+        </div>
+
+        <div class="mt-2">
+          <div class="section-title" style="margin-bottom:.5rem">En revelado</div>
+          <div id="dash-in-dev"></div>
+        </div>
+
+        <div class="mt-2">
+          <div class="section-title" style="margin-bottom:.5rem">Últimos escaneados</div>
+          <div id="dash-scanned"></div>
+        </div>
+      </section>
+
+      <!-- ==================== CAMERAS ==================== -->
+      <section id="cameras-view" class="view">
+        <div class="page-header">
+          <h2>Cámaras</h2>
+          <button id="btn-add-camera" class="btn btn-primary">+ Añadir cámara</button>
+        </div>
+        <div class="table-wrapper">
+          <div class="empty-state">
+            <div class="empty-icon">&#128247;</div>
+            <p>Cargando…</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== LENSES ==================== -->
+      <section id="lenses-view" class="view">
+        <div class="page-header">
+          <h2>Lentes</h2>
+          <button id="btn-add-lens" class="btn btn-primary">+ Añadir lente</button>
+        </div>
+        <div class="table-wrapper">
+          <div class="empty-state">
+            <div class="empty-icon">&#128300;</div>
+            <p>Cargando…</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== FILMS ==================== -->
+      <section id="films-view" class="view">
+        <div class="page-header">
+          <h2>Rollos</h2>
+          <button id="btn-add-film" class="btn btn-primary">+ Añadir rollo</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+          <select id="filter-status">
+            <option value="">Todos los estados</option>
+            <option value="en_camara">En cámara</option>
+            <option value="en_revelado">En revelado</option>
+            <option value="finalizado">Finalizado</option>
+            <option value="escaneado">Escaneado</option>
+          </select>
+          <select id="filter-type">
+            <option value="">Todos los tipos</option>
+            <option value="color">Color</option>
+            <option value="bw">B&N</option>
+            <option value="slide">Diapositiva</option>
+          </select>
+          <select id="filter-format">
+            <option value="">Todos los formatos</option>
+            <option value="35mm">35mm</option>
+            <option value="120">120</option>
+            <option value="Super8">Super 8</option>
+          </select>
+          <input id="filter-search" type="text" placeholder="Buscar marca, nombre, ciudad…" style="min-width:180px">
+        </div>
+
+        <div class="table-wrapper">
+          <div class="empty-state">
+            <div class="empty-icon">&#127926;</div>
+            <p>Cargando…</p>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /page-content -->
+  </div><!-- /main-content -->
+</div><!-- /app-screen -->
+
+<!-- ============================================================
+     MODAL
+     ============================================================ -->
+<div id="modal-overlay" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Modal</h3>
+      <button id="modal-close" class="modal-close" aria-label="Cerrar">&#x2715;</button>
+    </div>
+    <div id="modal-body" class="modal-body"></div>
+    <div class="modal-footer">
+      <button id="modal-cancel" class="btn btn-ghost">Cancelar</button>
+      <button id="modal-save" class="btn btn-primary">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- ============================================================
+     Scripts
+     ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/cameras.js"></script>
+<script src="js/lenses.js"></script>
+<script src="js/films.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
