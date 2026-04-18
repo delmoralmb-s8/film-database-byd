@@ -32,8 +32,7 @@ const Dashboard = (() => {
     // Rollos en revelado
     renderCards('dash-in-dev', inDev, '🧪 En revelado', inDev.length === 0);
 
-    // Últimos escaneados
-    renderCards('dash-scanned', scanned.slice(0, 6), '🖼 Escaneados', scanned.length === 0);
+    renderCards('dash-scanned', scanned.slice(0, 6), '🖼 Por escanear', scanned.length === 0);
   }
 
   function renderCards(containerId, list, emptyMsg, isEmpty) {

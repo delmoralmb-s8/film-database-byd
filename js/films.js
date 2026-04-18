@@ -73,7 +73,7 @@ const Films = (() => {
     en_camara:   { label: 'En cámara',   cls: 'badge-blue'   },
     en_revelado: { label: 'En revelado', cls: 'badge-yellow'  },
     finalizado:  { label: 'Finalizado',  cls: 'badge-green'   },
-    escaneado:   { label: 'Escaneado',   cls: 'badge-purple'  },
+    escaneado:   { label: 'Por escanear', cls: 'badge-purple'  },
   };
 
   const FILM_STATUS_CFG = {
@@ -324,7 +324,7 @@ const Films = (() => {
           <select id="f-status">
             ${sel([
               ['en_camara','En cámara'],['en_revelado','En revelado'],
-              ['finalizado','Finalizado'],['escaneado','Escaneado']
+              ['finalizado','Finalizado'],['escaneado','Por escanear']
             ], v('current_status','en_camara'))}
           </select>
         </div>
