@@ -152,6 +152,13 @@ const Films = (() => {
     return `<span class="badge ${c.cls}">${c.label}</span>`;
   }
 
+  const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  function formatDate(str) {
+    if (!str) return null;
+    const [y, m, d] = str.split('-');
+    return `${parseInt(d)} ${MONTHS[parseInt(m) - 1]} ${y}`;
+  }
+
   function cameraName(film) {
     if (!film.cameras) return '—';
     return `${film.cameras.brand} ${film.cameras.model}`;
@@ -429,7 +436,7 @@ const Films = (() => {
       <table>
         <thead><tr>
           <th>Rollo</th><th>Tipo</th><th>ISO</th><th>Formato</th>
-          <th>Cámara</th><th>Estado</th><th>Push/Pull</th><th>Lab</th><th></th>
+          <th>Cámara</th><th>Estado</th><th>Push/Pull</th><th>Lab</th><th>Inicio</th><th>Fin</th><th></th>
         </tr></thead>
         <tbody>
           ${list.map(f => `
@@ -445,6 +452,8 @@ const Films = (() => {
               <td>${statusBadge(f.current_status)}</td>
               <td>${f.push_pull !== 'no' ? `<span class="badge badge-yellow">${f.push_pull}</span>` : '<span class="text-muted">—</span>'}</td>
               <td class="text-sm">${f.lab || '—'}</td>
+              <td class="text-sm">${formatDate(f.start_date) || '—'}</td>
+              <td class="text-sm">${formatDate(f.end_date) || '—'}</td>
               <td>
                 <div class="actions">
                   <button class="btn btn-ghost btn-sm btn-icon" onclick="Films.openEdit('${f.id}')">✏️</button>
@@ -499,6 +508,6 @@ const Films = (() => {
   return {
     load, getAll, save, render, openModal, openEdit, bindUI,
     onFormatChange, onBrandChange, onNameChange,
-    STATUS_CONFIG, FILM_STATUS_CFG, statusBadge, filmStatusBadge
+    STATUS_CONFIG, FILM_STATUS_CFG, statusBadge, filmStatusBadge, formatDate
   };
 })();

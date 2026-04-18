@@ -851,3 +851,121 @@ tbody td {
 .text-sm { font-size: .8rem; }
 .mt-1 { margin-top: .5rem; }
 .mt-2 { margin-top: 1rem; }
+
+/* ============================================================
+   Film Detail View
+   ============================================================ */
+.detail-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: var(--shadow);
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detail-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.detail-brand {
+  font-size: .9rem;
+  color: var(--text-muted);
+  margin-top: .2rem;
+}
+
+.detail-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .3rem;
+  flex-shrink: 0;
+}
+
+.detail-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-grid {
+  display: flex;
+  flex-direction: column;
+  gap: .65rem;
+  margin-bottom: 1.25rem;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 1.5rem 7rem 1fr;
+  align-items: center;
+  gap: .5rem;
+  font-size: .9rem;
+}
+
+.detail-icon { font-size: 1rem; }
+
+.detail-label {
+  color: var(--text-muted);
+  font-size: .82rem;
+}
+
+.detail-value {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.detail-notes {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-notes-label {
+  font-size: .75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-muted);
+  margin-bottom: .5rem;
+}
+
+.detail-notes-body {
+  font-size: .9rem;
+  color: var(--text-dim);
+  white-space: pre-wrap;
+}
+
+.detail-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: .75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+  .detail-card { padding: 1.25rem; margin: 0; border-radius: var(--radius); }
+  .detail-title { font-size: 1.25rem; }
+  .detail-row { grid-template-columns: 1.5rem 6rem 1fr; }
+  .detail-actions { position: fixed; bottom: 4rem; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: .75rem 1rem; z-index: 10; }
+}

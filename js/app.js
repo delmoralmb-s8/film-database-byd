@@ -63,7 +63,7 @@ const Modal = (() => {
 // ============================================================
 
 const App = (() => {
-  const views = ['dashboard', 'cameras', 'lenses', 'films'];
+  const views = ['dashboard', 'cameras', 'lenses', 'films', 'film-detail'];
   let currentView = 'dashboard';
 
   function navigate(view) {
@@ -71,14 +71,16 @@ const App = (() => {
     views.forEach(v => {
       document.getElementById(`${v}-view`).classList.toggle('active', v === view);
     });
+    const navView = view === 'film-detail' ? 'dashboard' : view;
     document.querySelectorAll('.nav-link, .bottom-nav-item[data-view]').forEach(link => {
-      link.classList.toggle('active', link.dataset.view === view);
+      link.classList.toggle('active', link.dataset.view === navView);
     });
     document.getElementById('page-title').textContent = {
-      dashboard: 'Panel de control',
-      cameras:   'Cámaras',
-      lenses:    'Lentes',
-      films:     'Rollos',
+      dashboard:   'Panel de control',
+      cameras:     'Cámaras',
+      lenses:      'Lentes',
+      films:       'Rollos',
+      'film-detail': 'Detalle del rollo',
     }[view] || view;
 
     // Close mobile sidebar
@@ -87,10 +89,11 @@ const App = (() => {
 
     // Render the active view
     switch (view) {
-      case 'dashboard': Dashboard.render(); break;
-      case 'cameras':   Cameras.render();   break;
-      case 'lenses':    Lenses.render();    break;
-      case 'films':     Films.render();     break;
+      case 'dashboard':   Dashboard.render();   break;
+      case 'cameras':     Cameras.render();     break;
+      case 'lenses':      Lenses.render();      break;
+      case 'films':       Films.render();       break;
+      case 'film-detail': FilmDetail.render();  break;
     }
   }
 

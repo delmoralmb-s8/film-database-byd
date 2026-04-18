@@ -5,6 +5,24 @@
 const Lenses = (() => {
   let lenses = [];
 
+  const DEFAULT_LENSES = [
+    { brand: 'Nikkor', focal_length: '50',   max_aperture: '1.4' },
+    { brand: 'Nikkor', focal_length: '50',   max_aperture: '1.8' },
+    { brand: 'Nikkor', focal_length: '55',   max_aperture: '2.8' },
+    { brand: 'Nikkor', focal_length: '28',   max_aperture: '2.8' },
+    { brand: 'Nikkor', focal_length: '105',  max_aperture: '2.5' },
+    { brand: 'Nikkor', focal_length: '35',   max_aperture: '2'   },
+    { brand: 'Nikkor', focal_length: '85',   max_aperture: '2'   },
+    { brand: 'Canon FD', focal_length: '50',     max_aperture: '1.2' },
+    { brand: 'Canon FD', focal_length: '50',     max_aperture: '1.4' },
+    { brand: 'Canon FD', focal_length: '50',     max_aperture: '1.8' },
+    { brand: 'Canon FD', focal_length: '28',     max_aperture: '2.8' },
+    { brand: 'Canon FD', focal_length: '85',     max_aperture: '1.8' },
+    { brand: 'Canon FD', focal_length: '100',    max_aperture: '4'   },
+    { brand: 'Canon FD', focal_length: '35-70',  max_aperture: '4'   },
+    { brand: 'Canon FD', focal_length: '35-105', max_aperture: '3.5' },
+  ];
+
   async function load() {
     const { data, error } = await supabase
       .from('lenses')
@@ -12,7 +30,17 @@ const Lenses = (() => {
       .order('brand');
     if (error) { Toast.show(error.message, 'error'); return []; }
     lenses = data;
+    if (!lenses.length) await seedDefaults();
     return lenses;
+  }
+
+  async function seedDefaults() {
+    const user = Auth.getUser();
+    if (!user) return;
+    const rows = DEFAULT_LENSES.map(l => ({ ...l, user_id: user.id }));
+    const { data, error } = await supabase.from('lenses').insert(rows).select();
+    if (error) { console.warn('seed lenses:', error.message); return; }
+    lenses = data;
   }
 
   function getAll() { return lenses; }

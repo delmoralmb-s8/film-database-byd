@@ -49,7 +49,7 @@ const Dashboard = (() => {
   function filmCard(f) {
     const cam = f.cameras ? `${f.cameras.brand} ${f.cameras.model}` : null;
     return `
-      <div class="film-card" onclick="Films.openEdit('${f.id}')">
+      <div class="film-card" onclick="FilmDetail.open('${f.id}')">
         <div class="film-card-header">
           <div>
             <div class="film-card-title">${f.name}</div>
@@ -65,6 +65,7 @@ const Dashboard = (() => {
         </div>
         ${cam ? `<div class="text-muted text-sm mt-1">📷 ${cam}</div>` : ''}
         ${f.city ? `<div class="text-muted text-sm">📍 ${f.city}${f.country ? ', '+f.country : ''}</div>` : ''}
+        ${(f.start_date || f.end_date) ? `<div class="text-muted text-sm">📅 ${Films.formatDate(f.start_date) || '?'}${f.end_date ? ' → ' + Films.formatDate(f.end_date) : ''}</div>` : ''}
       </div>`;
   }
 
