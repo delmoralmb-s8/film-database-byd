@@ -25,6 +25,7 @@ const Films = (() => {
       'Verita 200D','Vision 3 250D AHU','Vision 3 500T AHU',
     ],
     'Fujifilm': [
+      'Fuji 100','Fuji 200',
       'Provia 100F','Provia 400','Provia 1600',
       'Velvia 50','Velvia 100','Astia 100F',
       'Superia 100','Superia 200','Superia 400 Premium','Superia X-TRA 400',
@@ -183,6 +184,10 @@ const Films = (() => {
       `<option value="${b}">${b}</option>`
     ).join('');
     brandSelect.value = format === 'Super8' ? 'Kodak' : (list[0] || '');
+    if (format === '120') {
+      const numPhotos = document.getElementById('f-num-photos');
+      if (numPhotos) numPhotos.value = '12';
+    }
     onBrandChange();
   }
 
@@ -297,9 +302,12 @@ const Films = (() => {
       <div class="form-row">
         <div class="form-group">
           <label>Cámara</label>
-          <select id="f-camera">
+          <select id="f-camera" onchange="Films.onCameraChange()">
             <option value="">— Sin cámara —</option>
-            ${cameras.map(c => `<option value="${c.id}" ${defCameraId === c.id ? 'selected' : ''}>${c.brand} ${c.model}</option>`).join('')}
+            ${isNew && cameras.length === 0
+              ? `<option value="__import_cameras__">📷 ¿Quieres importar las cámaras de nuestro brevísimo catálogo?</option>`
+              : cameras.map(c => `<option value="${c.id}" ${defCameraId === c.id ? 'selected' : ''}>${c.brand} ${c.model}</option>`).join('')
+            }
           </select>
         </div>
         <div class="form-group">
@@ -361,7 +369,9 @@ const Films = (() => {
           ${sel([
             ['paisaje','Paisaje'],['retrato','Retrato'],['macro','Macro'],
             ['boda','Boda'],['eventos','Eventos'],['mascotas','Mascotas'],
-            ['estudio','Estudio'],['producto','De producto'],['otro','Otro']
+            ['estudio','Estudio'],['producto','De producto'],
+            ['chile_mole','De chile, mole y pozole'],['ex','de mi ex :('],
+            ['otro','Otro']
           ], v('photo_type'))}
         </select>
       </div>
@@ -399,6 +409,50 @@ const Films = (() => {
     };
   }
 
+  async function remove(id) {
+    const { error } = await supabase.from('films').delete().eq('id', id);
+    if (error) throw error;
+    films = films.filter(f => f.id !== id);
+  }
+
+  function confirmDelete(id) {
+    const film = films.find(f => f.id === id);
+    if (!film) return;
+    Modal.open({
+      title: 'Eliminar rollo',
+      body: `<p>¿Estás seguro que quieres eliminar tu rollo :O ?<br><strong>${film.name} — ${film.brand}</strong></p>`,
+      saveLabel: 'Eliminar',
+      saveDanger: true,
+      onSave: async () => {
+        await remove(id);
+        Toast.show('Rollo eliminado', 'success');
+        await render();
+        await Dashboard.render();
+        return true;
+      }
+    });
+  }
+
+  async function onCameraChange() {
+    const val = document.getElementById('f-camera')?.value;
+    if (val !== '__import_cameras__') return;
+    await Cameras.seedDefaults();
+    await Lenses.seedDefaults();
+    const updatedCameras = Cameras.getAll();
+    const updatedLenses  = Lenses.getAll();
+    const camSel = document.getElementById('f-camera');
+    camSel.innerHTML = `<option value="">— Sin cámara —</option>` +
+      updatedCameras.map(c => `<option value="${c.id}">${c.brand} ${c.model}</option>`).join('');
+    const defCam = updatedCameras.find(c => /nikon/i.test(c.brand) && /f3/i.test(c.model));
+    if (defCam) camSel.value = defCam.id;
+    const lensSel = document.getElementById('f-lens');
+    lensSel.innerHTML = `<option value="">— Sin lente —</option>` +
+      updatedLenses.map(l => `<option value="${l.id}">${l.brand} ${l.focal_length}</option>`).join('');
+    const defLens = updatedLenses.find(l => /nikkor/i.test(l.brand) && /^50mm f\/1\.4/.test(l.focal_length))
+                 || updatedLenses.find(l => /nikkor/i.test(l.brand) && /50/.test(l.focal_length));
+    if (defLens) lensSel.value = defLens.id;
+  }
+
   // ---- Render list ----
 
   async function render() {
@@ -432,11 +486,13 @@ const Films = (() => {
       return;
     }
 
+    const hasNotes = list.some(f => f.notes);
     wrapper.innerHTML = `
       <table>
         <thead><tr>
           <th>Rollo</th><th>Tipo</th><th>ISO</th><th>Formato</th>
-          <th>Cámara</th><th>Estado</th><th>Push/Pull</th><th>Lab</th><th>Inicio</th><th>Fin</th><th></th>
+          <th>Cámara</th><th>Estado</th><th>Push/Pull</th><th>Lab</th><th>Inicio</th><th>Fin</th>
+          ${hasNotes ? '<th>Notas</th>' : ''}<th></th>
         </tr></thead>
         <tbody>
           ${list.map(f => `
@@ -454,9 +510,11 @@ const Films = (() => {
               <td class="text-sm">${f.lab || '—'}</td>
               <td class="text-sm">${formatDate(f.start_date) || '—'}</td>
               <td class="text-sm">${formatDate(f.end_date) || '—'}</td>
+              ${hasNotes ? `<td class="text-sm">${f.notes || ''}</td>` : ''}
               <td>
                 <div class="actions">
                   <button class="btn btn-ghost btn-sm btn-icon" onclick="Films.openEdit('${f.id}')">✏️</button>
+                  <button class="btn btn-danger btn-sm btn-icon" onclick="Films.confirmDelete('${f.id}')">🗑</button>
                 </div>
               </td>
             </tr>`).join('')}
@@ -508,7 +566,8 @@ const Films = (() => {
 
   return {
     load, getAll, save, render, openModal, openEdit, bindUI,
-    onFormatChange, onBrandChange, onNameChange,
+    onFormatChange, onBrandChange, onNameChange, onCameraChange,
+    remove, confirmDelete,
     STATUS_CONFIG, FILM_STATUS_CFG, statusBadge, filmStatusBadge, formatDate
   };
 })();
