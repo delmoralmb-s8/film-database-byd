@@ -20,25 +20,39 @@
   --radius:      8px;
   --radius-lg:   12px;
   --shadow:      0 4px 24px rgba(0,0,0,.08);
-  --transition:  .18s ease;
+  --transition:  .2s cubic-bezier(0.4, 0, 0.2, 1);
   --sidebar-w:   220px;
   --font:        'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Dark theme overrides */
+/* Dark theme — tinte frío verdoso, jerarquía de capas */
 [data-theme="dark"] {
-  --bg:          #1a1a1a;
-  --surface:     #232323;
-  --card:        #2c2c2c;
-  --card-hover:  #333333;
-  --border:      #3d3d3d;
-  --primary-dim: #143f30;
+  /* Capa 1 — fondo principal */
+  --bg:          #0f1a17;
+  /* Capa 2 — superficies secundarias (sidebar, panels, table) */
+  --surface:     #162320;
+  /* Capa 3 — cards y elementos elevados */
+  --card:        #1d2e28;
+  --card-hover:  #243830;
+  /* Bordes sutiles con tinte verde */
+  --border:      #27403a;
+
+  /* Verde acento — escala */
+  --primary:     #1C6A51;
+  --primary-h:   #21896a;
+  --primary-dim: #0d2820;
+
+  /* Danger */
   --danger:      #c0392b;
   --danger-h:    #e74c3c;
-  --text:        #e2e8f0;
-  --text-muted:  #6b7280;
-  --text-dim:    #9ca3af;
-  --shadow:      0 4px 24px rgba(0,0,0,.45);
+
+  /* Tipografía — grises suaves, no blancos puros */
+  --text:        #d6e8e1;
+  --text-muted:  #5e8a7c;
+  --text-dim:    #93bfb3;
+
+  /* Efectos */
+  --shadow:      0 4px 20px rgba(0,0,0,.45), 0 1px 4px rgba(0,0,0,.3);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -478,12 +492,12 @@ a:hover { color: var(--primary-h); }
 .badge-teal   { background: var(--primary-dim); color: var(--primary-h); }
 
 /* Dark badge overrides */
-[data-theme="dark"] .badge-green  { background: #14532d; color: #4ade80; }
-[data-theme="dark"] .badge-yellow { background: #78350f; color: #fbbf24; }
-[data-theme="dark"] .badge-red    { background: #7f1d1d; color: #f87171; }
-[data-theme="dark"] .badge-blue   { background: #1e3a5f; color: #60a5fa; }
-[data-theme="dark"] .badge-purple { background: #3b0764; color: #c084fc; }
-[data-theme="dark"] .badge-gray   { background: #333333; color: #9ca3af; }
+[data-theme="dark"] .badge-green  { background: #0d2e1a; color: #4ade80; }
+[data-theme="dark"] .badge-yellow { background: #2e1f05; color: #fbbf24; }
+[data-theme="dark"] .badge-red    { background: #2e0f0f; color: #f87171; }
+[data-theme="dark"] .badge-blue   { background: #0e2236; color: #60a5fa; }
+[data-theme="dark"] .badge-purple { background: #1e0f35; color: #c084fc; }
+[data-theme="dark"] .badge-gray   { background: #1d2e28; color: #93bfb3; }
 
 /* ============================================================
    Table
@@ -842,6 +856,39 @@ tbody td {
   transition: var(--transition);
 }
 .theme-toggle:hover { background: var(--card); color: var(--text); }
+
+/* ============================================================
+   Headings — tracking negativo para personalidad
+   ============================================================ */
+h1, h2, h3, h4 {
+  letter-spacing: -0.025em;
+}
+
+/* ============================================================
+   Interacciones — estados claros
+   ============================================================ */
+.btn:active {
+  transform: scale(0.97);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-dim);
+}
+
+[data-theme="dark"] .form-group input:focus,
+[data-theme="dark"] .form-group select:focus,
+[data-theme="dark"] .form-group textarea:focus {
+  box-shadow: 0 0 0 3px rgba(28, 106, 81, 0.35);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
 
 /* ============================================================
    Misc utils
