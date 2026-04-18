@@ -46,7 +46,9 @@ const Auth = (() => {
   }
 
   async function logout() {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) { Toast.show(error.message, 'error'); return; }
+    window.location.reload();
   }
 
   function bindUI() {
