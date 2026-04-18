@@ -6,21 +6,21 @@ const Lenses = (() => {
   let lenses = [];
 
   const DEFAULT_LENSES = [
-    { brand: 'Nikkor', focal_length: '50',   max_aperture: '1.4' },
-    { brand: 'Nikkor', focal_length: '50',   max_aperture: '1.8' },
-    { brand: 'Nikkor', focal_length: '55',   max_aperture: '2.8' },
-    { brand: 'Nikkor', focal_length: '28',   max_aperture: '2.8' },
-    { brand: 'Nikkor', focal_length: '105',  max_aperture: '2.5' },
-    { brand: 'Nikkor', focal_length: '35',   max_aperture: '2'   },
-    { brand: 'Nikkor', focal_length: '85',   max_aperture: '2'   },
-    { brand: 'Canon FD', focal_length: '50',     max_aperture: '1.2' },
-    { brand: 'Canon FD', focal_length: '50',     max_aperture: '1.4' },
-    { brand: 'Canon FD', focal_length: '50',     max_aperture: '1.8' },
-    { brand: 'Canon FD', focal_length: '28',     max_aperture: '2.8' },
-    { brand: 'Canon FD', focal_length: '85',     max_aperture: '1.8' },
-    { brand: 'Canon FD', focal_length: '100',    max_aperture: '4'   },
-    { brand: 'Canon FD', focal_length: '35-70',  max_aperture: '4'   },
-    { brand: 'Canon FD', focal_length: '35-105', max_aperture: '3.5' },
+    { brand: 'Nikkor',   focal_length: '50mm f/1.4 AI-s',    max_aperture: '1.4' },
+    { brand: 'Nikkor',   focal_length: '50mm f/1.8 AI-s',    max_aperture: '1.8' },
+    { brand: 'Nikkor',   focal_length: '55mm f/2.8 Micro',   max_aperture: '2.8' },
+    { brand: 'Nikkor',   focal_length: '28mm f/2.8 AI-s',    max_aperture: '2.8' },
+    { brand: 'Nikkor',   focal_length: '105mm f/2.5',        max_aperture: '2.5' },
+    { brand: 'Nikkor',   focal_length: '35mm f/2 AI-s',      max_aperture: '2'   },
+    { brand: 'Nikkor',   focal_length: '85mm f/2 AI-s',      max_aperture: '2'   },
+    { brand: 'Canon FD', focal_length: '50mm f/1.2 L',       max_aperture: '1.2' },
+    { brand: 'Canon FD', focal_length: '50mm f/1.4',         max_aperture: '1.4' },
+    { brand: 'Canon FD', focal_length: '50mm f/1.8',         max_aperture: '1.8' },
+    { brand: 'Canon FD', focal_length: '28mm f/2.8',         max_aperture: '2.8' },
+    { brand: 'Canon FD', focal_length: '85mm f/1.8',         max_aperture: '1.8' },
+    { brand: 'Canon FD', focal_length: '100mm f/4 Macro',    max_aperture: '4'   },
+    { brand: 'Canon FD', focal_length: '35-70mm f/4',        max_aperture: '4'   },
+    { brand: 'Canon FD', focal_length: '35-105mm f/3.5',     max_aperture: '3.5' },
   ];
 
   async function load() {
@@ -37,10 +37,17 @@ const Lenses = (() => {
   async function seedDefaults() {
     const user = Auth.getUser();
     if (!user) return;
-    const rows = DEFAULT_LENSES.map(l => ({ ...l, user_id: user.id }));
+    // Only insert defaults that don't already exist (match by brand + focal + aperture)
+    const missing = DEFAULT_LENSES.filter(d =>
+      !lenses.some(l => l.brand === d.brand && l.focal_length === d.focal_length)
+    );
+    if (!missing.length) { Toast.show('Todas las lentes predeterminadas ya están añadidas', 'success'); return; }
+    const rows = missing.map(l => ({ ...l, user_id: user.id }));
     const { data, error } = await supabase.from('lenses').insert(rows).select();
-    if (error) { console.warn('seed lenses:', error.message); return; }
-    lenses = data;
+    if (error) { Toast.show(error.message, 'error'); return; }
+    lenses = [...lenses, ...data];
+    Toast.show(`${data.length} lentes importadas`, 'success');
+    await render();
   }
 
   function getAll() { return lenses; }
@@ -85,14 +92,14 @@ const Lenses = (() => {
     wrapper.innerHTML = `
       <table>
         <thead><tr>
-          <th>Marca</th><th>Focal</th><th>Apertura máx.</th><th></th>
+          <th>Marca</th><th>Lente</th><th></th>
         </tr></thead>
         <tbody>
           ${lenses.map(l => `
             <tr>
               <td>${l.brand}</td>
               <td>${l.focal_length}</td>
-              <td>f/${l.max_aperture}</td>
+              <td></td>
               <td>
                 <div class="actions">
                   <button class="btn btn-ghost btn-sm btn-icon" onclick="Lenses.openEdit('${l.id}')">✏️</button>
@@ -151,7 +158,7 @@ const Lenses = (() => {
     if (!lens) return;
     Modal.open({
       title: 'Eliminar lente',
-      body: `<p>¿Eliminar <strong>${lens.brand} ${lens.focal_length}mm</strong>? Los rollos asociados quedarán sin lente asignada.</p>`,
+      body: `<p>¿Eliminar <strong>${lens.brand} ${lens.focal_length}</strong>? Los rollos asociados quedarán sin lente asignada.</p>`,
       saveLabel: 'Eliminar',
       saveDanger: true,
       onSave: async () => {
@@ -165,7 +172,8 @@ const Lenses = (() => {
 
   function bindUI() {
     document.getElementById('btn-add-lens')?.addEventListener('click', () => openModal());
+    document.getElementById('btn-seed-lenses')?.addEventListener('click', () => seedDefaults());
   }
 
-  return { load, getAll, render, openModal, openEdit, confirmDelete, bindUI };
+  return { load, getAll, render, openModal, openEdit, confirmDelete, bindUI, seedDefaults };
 })();

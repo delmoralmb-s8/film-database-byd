@@ -20,7 +20,7 @@ const FilmDetail = (() => {
     }
 
     const cam   = film.cameras ? `${film.cameras.brand} ${film.cameras.model}` : null;
-    const lens  = film.lenses  ? `${film.lenses.brand} ${film.lenses.focal_length}mm` : null;
+    const lens  = film.lenses  ? `${film.lenses.brand} ${film.lenses.focal_length}` : null;
     const start = Films.formatDate(film.start_date);
     const end   = Films.formatDate(film.end_date);
 

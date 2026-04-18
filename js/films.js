@@ -166,7 +166,7 @@ const Films = (() => {
 
   function lensName(film) {
     if (!film.lenses) return '—';
-    return `${film.lenses.brand} ${film.lenses.focal_length}mm`;
+    return `${film.lenses.brand} ${film.lenses.focal_length}`;
   }
 
   const SUPER8_STOCKS = [
@@ -228,7 +228,7 @@ const Films = (() => {
       ? (cameras.find(c => /nikon/i.test(c.brand) && /f3/i.test(c.model))?.id ?? '')
       : v('camera_id');
     const defLensId = isNew
-      ? (lenses.find(l => /nikkor/i.test(l.brand) && /50/.test(l.focal_length))?.id ?? '')
+      ? (lenses.find(l => /nikkor/i.test(l.brand) && /^50mm f\/1\.4/.test(l.focal_length))?.id ?? lenses.find(l => /nikkor/i.test(l.brand) && /50/.test(l.focal_length))?.id ?? '')
       : v('lens_id');
     const defStart   = isNew ? today   : v('start_date');
     const defEnd     = isNew ? today   : v('end_date');
@@ -306,7 +306,7 @@ const Films = (() => {
           <label>Lente</label>
           <select id="f-lens">
             <option value="">— Sin lente —</option>
-            ${lenses.map(l => `<option value="${l.id}" ${defLensId === l.id ? 'selected' : ''}>${l.brand} ${l.focal_length}mm</option>`).join('')}
+            ${lenses.map(l => `<option value="${l.id}" ${defLensId === l.id ? 'selected' : ''}>${l.brand} ${l.focal_length}</option>`).join('')}
           </select>
         </div>
       </div>
@@ -496,6 +496,7 @@ const Films = (() => {
 
   function bindUI() {
     document.getElementById('btn-add-film')?.addEventListener('click', () => openModal());
+    document.getElementById('btn-add-film-list')?.addEventListener('click', () => openModal());
     document.getElementById('btn-add-film-mobile')?.addEventListener('click', () => openModal());
     document.getElementById('btn-add-film-dash')?.addEventListener('click', () => openModal());
 

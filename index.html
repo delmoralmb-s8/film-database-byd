@@ -172,7 +172,10 @@
       <section id="cameras-view" class="view">
         <div class="page-header">
           <h2>Cámaras</h2>
-          <button id="btn-add-camera" class="btn btn-primary">+ Añadir cámara</button>
+          <div style="display:flex;gap:.5rem">
+            <button id="btn-seed-cameras" class="btn btn-ghost btn-sm">↓ Importar predeterminadas</button>
+            <button id="btn-add-camera" class="btn btn-primary">+ Añadir cámara</button>
+          </div>
         </div>
         <div class="table-wrapper">
           <div class="empty-state">
@@ -186,7 +189,10 @@
       <section id="lenses-view" class="view">
         <div class="page-header">
           <h2>Lentes</h2>
-          <button id="btn-add-lens" class="btn btn-primary">+ Añadir lente</button>
+          <div style="display:flex;gap:.5rem">
+            <button id="btn-seed-lenses" class="btn btn-ghost btn-sm">↓ Importar predeterminadas</button>
+            <button id="btn-add-lens" class="btn btn-primary">+ Añadir lente</button>
+          </div>
         </div>
         <div class="table-wrapper">
           <div class="empty-state">
@@ -205,7 +211,7 @@
       <section id="films-view" class="view">
         <div class="page-header">
           <h2>Rollos</h2>
-          <button id="btn-add-film" class="btn btn-primary">+ Añadir rollo</button>
+          <button id="btn-add-film-list" class="btn btn-primary">+ Añadir rollo</button>
         </div>
 
         <!-- Filters -->
