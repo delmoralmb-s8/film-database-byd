@@ -367,6 +367,7 @@ const Films = (() => {
         <select id="f-photo-type">
           <option value="">— Sin clasificar —</option>
           ${sel([
+            ['familia','Familia'],['amigos','Amigos'],
             ['paisaje','Paisaje'],['retrato','Retrato'],['macro','Macro'],
             ['boda','Boda'],['eventos','Eventos'],['mascotas','Mascotas'],
             ['estudio','Estudio'],['producto','De producto'],

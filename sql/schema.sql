@@ -57,8 +57,10 @@ CREATE TABLE IF NOT EXISTS films (
   city           TEXT,
   country        TEXT,
   photo_type     TEXT CHECK (photo_type IN (
+                   'familia','amigos',
                    'paisaje','retrato','macro','boda',
-                   'eventos','mascotas','estudio','producto','otro')),
+                   'eventos','mascotas','estudio','producto',
+                   'chile_mole','ex','otro')),
   created_at     TIMESTAMPTZ DEFAULT NOW(),
   updated_at     TIMESTAMPTZ DEFAULT NOW()
 );
