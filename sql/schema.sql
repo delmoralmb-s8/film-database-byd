@@ -69,6 +69,22 @@ ALTER TABLE films ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "films_rls" ON films FOR ALL
   USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+-- LOGS (accesos privados — solo visible desde el dashboard de Supabase)
+CREATE TABLE IF NOT EXISTS logs (
+  id         UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  alias      TEXT,
+  user_agent TEXT,
+  location   TEXT,
+  note       TEXT
+);
+
+ALTER TABLE logs ENABLE ROW LEVEL SECURITY;
+
+-- Cualquier usuario autenticado puede insertar su propio log
+CREATE POLICY "logs_insert" ON logs FOR INSERT
+  TO authenticated WITH CHECK (true);
+
 -- Auto-update updated_at
 CREATE OR REPLACE FUNCTION update_updated_at()
 RETURNS TRIGGER AS $$

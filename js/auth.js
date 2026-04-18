@@ -32,7 +32,34 @@ const Auth = (() => {
     document.getElementById('auth-screen').classList.add('hidden');
     document.getElementById('app-screen').classList.remove('hidden');
     document.getElementById('user-email').textContent = currentUser.email;
+    logAccess(currentUser);
     App.init();
+  }
+
+  async function logAccess(user) {
+    if (sessionStorage.getItem('access_logged')) return;
+
+    let alias = localStorage.getItem('user_alias');
+    if (!alias) {
+      alias = user.email.split('@')[0];
+      localStorage.setItem('user_alias', alias);
+    }
+
+    let location = null;
+    try {
+      const res = await fetch('https://api.ipify.org?format=json');
+      const data = await res.json();
+      location = data.ip;
+    } catch (_) {}
+
+    try {
+      await supabase.from('logs').insert({
+        alias,
+        user_agent: navigator.userAgent,
+        location,
+      });
+      sessionStorage.setItem('access_logged', '1');
+    } catch (_) {}
   }
 
   async function login(email, password) {
@@ -46,8 +73,7 @@ const Auth = (() => {
   }
 
   async function logout() {
-    const { error } = await supabase.auth.signOut();
-    if (error) { Toast.show(error.message, 'error'); return; }
+    try { await supabase.auth.signOut(); } catch (_) {}
     window.location.reload();
   }
 
