@@ -2,11 +2,11 @@
    CSS Variables — Light theme (default)
    ============================================================ */
 :root {
-  --bg:          #f1f5f9;
-  --surface:     #ffffff;
-  --card:        #f8fafc;
-  --card-hover:  #f1f5f9;
-  --border:      #e2e8f0;
+  --bg:          #ede8df;
+  --surface:     #f7f3ec;
+  --card:        #f0ece3;
+  --card-hover:  #e8e3d9;
+  --border:      #d8d0c4;
   --primary:     #1C6A51;
   --primary-h:   #17553f;
   --primary-dim: #dcfce7;
