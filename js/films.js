@@ -184,9 +184,21 @@ const Films = (() => {
       `<option value="${b}">${b}</option>`
     ).join('');
     brandSelect.value = format === 'Super8' ? 'Kodak' : (list[0] || '');
-    if (format === '120') {
-      const numPhotos = document.getElementById('f-num-photos');
-      if (numPhotos) numPhotos.value = '12';
+
+    const numPhotos = document.getElementById('f-num-photos');
+    if (numPhotos) {
+      if (format === 'Super8') {
+        numPhotos.innerHTML =
+          `<option value="">—</option>` +
+          [['9','9 fps'],['18','18 fps'],['24','24 fps']]
+            .map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+      } else {
+        numPhotos.innerHTML =
+          `<option value="">—</option>` +
+          [['12','12'],['24','24'],['36','36']]
+            .map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+        if (format === '120') numPhotos.value = '12';
+      }
     }
     onBrandChange();
   }

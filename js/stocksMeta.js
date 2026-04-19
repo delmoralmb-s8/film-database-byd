@@ -33,7 +33,12 @@ const StockChip = (() => {
     'Kodak|Ektachrome E100':    ['#1a5ab8','#0a3480','#c8dff8','KODAK','EKTA\nE100'],
     'Kodak|Vision3 50D':        ['#2870c0','#0c3a80','#b8d0f0','KODAK','VIS3\n50D'],
     'Kodak|Vision3 250D':       ['#2060a8','#0a3070','#b0c8e8','KODAK','VIS3\n250D'],
+    'Kodak|Vision3 200T':       ['#1a3070','#080e38','#a8b8e0','KODAK','VIS3\n200T'],
     'Kodak|Vision3 500T':       ['#182860','#080e28','#a0b4d8','KODAK','VIS3\n500T'],
+    'Kodak|Ektachrome':         ['#0a50a8','#042878','#b8d0f8','KODAK','EKTA\nS8'],
+    'Kodak|Tri-X Reversal':     ['#303030','#141414','#d0d0d0','KODAK','TRI-X\nREV'],
+    'Kodak|Kodacolor 100':      ['#e8c828','#b89800','#2a1c00','KODAK','KODA\n100'],
+    'Kodak|Kodacolor 200':      ['#f0d020','#c0a000','#2a1800','KODAK','KODA\n200'],
     // ── FUJIFILM ────────────────────────────────
     'Fujifilm|Fuji 100':        ['#34a85a','#0a7030','#d0f8e0','FUJI','FUJI\n100'],
     'Fujifilm|Fuji 200':        ['#2a9a4a','#0a6a2a','#c8f0d8','FUJI','FUJI\n200'],
@@ -89,6 +94,22 @@ const StockChip = (() => {
     // ── KENTMERE ────────────────────────────────
     'Kentmere|100':             ['#3a5a3a','#182818','#a8c8a8','KENT','100'],
     'Kentmere|400':             ['#2a4a2a','#101e10','#98b898','KENT','400'],
+    // ── LUCKY ───────────────────────────────────
+    'Lucky|Lucky 200':          ['#c83010','#882000','#ffd0b8','LUCKY','200'],
+    // ── SANTACOLOR ──────────────────────────────
+    'SantaColor|SantaColor 100':['#c82020','#881010','#ffd0d0','SANTA','SC\n100'],
+    'SantaColor|SantaColor 800':['#a81010','#680808','#ffc8c8','SANTA','SC\n800'],
+    // ── ORWO ────────────────────────────────────
+    'Orwo|Wolfenc NC 200':      ['#c83810','#882000','#ffd0a8','ORWO','NC\n200'],
+    'Orwo|Wolfenc NC 400':      ['#b83010','#781800','#ffc8a0','ORWO','NC\n400'],
+    'Orwo|Wolfenc NC 500':      ['#a82808','#681400','#ffc098','ORWO','NC\n500'],
+    'Orwo|UN54':                ['#882010','#481008','#ffb890','ORWO','UN54'],
+    'Orwo|NP100':               ['#a03820','#602010','#ffc8a8','ORWO','NP100'],
+    'Orwo|Vision3 50D':         ['#2870c0','#0c3a80','#b8d0f0','ORWO','VIS3\n50D'],
+    'Orwo|Vision3 200T':        ['#1a3070','#080e38','#a8b8e0','ORWO','VIS3\n200T'],
+    'Orwo|Vision3 500T':        ['#182860','#080e28','#a0b4d8','ORWO','VIS3\n500T'],
+    'Orwo|Ektachrome':          ['#0a50a8','#042878','#b8d0f8','ORWO','EKTA'],
+    'Orwo|Tri-X Reversal':      ['#303030','#141414','#d0d0d0','ORWO','TRI-X\nREV'],
     // ── ADOX ────────────────────────────────────
     'Adox|CHS 100 II':          ['#2a1a50','#100830','#c0a8f0','ADOX','CHS\n100'],
     'Adox|Silvermax 100':       ['#1a2a1a','#080e08','#90c090','ADOX','SILVER\nMAX'],
