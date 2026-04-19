@@ -95,15 +95,20 @@ const Timeline = (() => {
           <div class="tl-line"></div>
         </div>
         <div class="tl-card">
-          <div class="tl-card-date">${label}</div>
-          <div class="tl-card-title">${f.name}</div>
-          <div class="tl-card-brand">${f.brand}</div>
-          <div class="tl-card-badges">
-            <span class="badge badge-yellow">${f.format}</span>
-            ${Films.statusBadge(f.current_status)}
-            ${Films.typeBadge(f.type)}
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">
+            <div style="flex:1;min-width:0">
+              <div class="tl-card-date">${label}</div>
+              <div class="tl-card-title">${f.name}</div>
+              <div class="tl-card-brand">${f.brand}</div>
+              <div class="tl-card-badges">
+                <span class="badge badge-yellow">${f.format}</span>
+                ${Films.statusBadge(f.current_status)}
+                ${Films.typeBadge(f.type)}
+              </div>
+              ${cam ? `<div class="tl-card-cam text-muted text-sm">&#128247; ${cam}</div>` : ''}
+            </div>
+            ${StockChip.render(f.brand, f.name, f.type, 'md')}
           </div>
-          ${cam ? `<div class="tl-card-cam text-muted text-sm">&#128247; ${cam}</div>` : ''}
         </div>
       </div>`;
   }

@@ -1018,6 +1018,47 @@ h1, h2, h3, h4 {
 }
 
 /* ============================================================
+   Stock Chip — mini visual etiqueta de emulsión
+   ============================================================ */
+.sc {
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 5px;
+  gap: 2px;
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 2px 4px rgba(0,0,0,.35);
+  user-select: none;
+  overflow: hidden;
+  text-align: center;
+}
+
+.sc--sm { width: 46px; height: 46px; }
+.sc--md { width: 58px; height: 58px; }
+.sc--lg { width: 76px; height: 76px; }
+
+.sc-brand {
+  font-size: 6px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  opacity: .78;
+  line-height: 1;
+}
+
+.sc-name {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  line-height: 1.2;
+}
+
+.sc--lg .sc-brand { font-size: 8px; }
+.sc--lg .sc-name  { font-size: 10.5px; }
+
+/* ============================================================
    Timeline
    ============================================================ */
 .tl-legend {

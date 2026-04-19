@@ -27,9 +27,12 @@ const FilmDetail = (() => {
     el.innerHTML = `
       <div class="detail-card">
         <div class="detail-header">
-          <div>
-            <div class="detail-title">${film.name}</div>
-            <div class="detail-brand">${film.brand}</div>
+          <div style="display:flex;gap:.85rem;align-items:flex-start">
+            ${StockChip.render(film.brand, film.name, film.type, 'lg')}
+            <div>
+              <div class="detail-title">${film.name}</div>
+              <div class="detail-brand">${film.brand}</div>
+            </div>
           </div>
           <div class="detail-badges">
             ${Films.statusBadge(film.current_status)}

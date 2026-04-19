@@ -41,9 +41,12 @@ const Dashboard = (() => {
     return `
       <div class="film-card" onclick="FilmDetail.open('${f.id}')">
         <div class="film-card-header">
-          <div>
-            <div class="film-card-title">${f.name}</div>
-            <div class="film-card-brand">${f.brand}</div>
+          <div style="display:flex;gap:.6rem;align-items:flex-start">
+            ${StockChip.render(f.brand, f.name, f.type, 'sm')}
+            <div>
+              <div class="film-card-title">${f.name}</div>
+              <div class="film-card-brand">${f.brand}</div>
+            </div>
           </div>
           ${Films.statusBadge(f.current_status)}
         </div>
