@@ -1,10 +1,21 @@
 // ============================================================
 // Stock Chip — mini visual label por emulsión
+// Muestra imagen si existe en imgs/stock/{slug}.jpg o .png
+// Si no existe, usa color chip de fallback.
 // ============================================================
 
 const StockChip = (() => {
 
-  // [gradient-top, gradient-bottom, text-color, brand-label, name-label]
+  // Convierte "Kodak Portra 400" → "kodak-portra-400"
+  function toSlug(brand, name) {
+    return `${brand}-${name}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/, '');
+  }
+
+  // Paleta de colores por emulsión [grad-top, grad-bottom, texto, label-marca, label-nombre]
   const META = {
     // ── KODAK ──────────────────────────────────
     'Kodak|Portra 160':         ['#c8a070','#8b6540','#fff3e8','KODAK','PORTRA\n160'],
@@ -87,17 +98,17 @@ const StockChip = (() => {
     'ReflxLab|400D':            ['#a06828','#684010','#ffdcb0','REFLX','400D'],
   };
 
-  // Fallback por tipo de película
+  // Fallback genérico por tipo
   const TYPE_FALLBACK = {
     color: ['#1c6a51','#0a3828','#a0e8d0'],
     bw:    ['#383838','#181818','#d0d0d0'],
     slide: ['#8a6a00','#4a3800','#ffe880'],
   };
 
-  function render(brand, name, type, size = 'md') {
+  // Genera el contenido interno del color chip
+  function _colorContent(brand, name, type) {
     const key = `${brand}|${name}`;
-    const m   = META[key];
-
+    const m = META[key];
     let c1, c2, textColor, brandLabel, nameLabel;
     if (m) {
       [c1, c2, textColor, brandLabel, nameLabel] = m;
@@ -107,14 +118,44 @@ const StockChip = (() => {
       brandLabel = brand.slice(0, 7).toUpperCase();
       nameLabel  = name.length > 10 ? name.slice(0, 9) + '…' : name;
     }
+    const lines = nameLabel.split('\n').join('<br>');
+    return { c1, c2, textColor, brandLabel, lines };
+  }
 
-    const nameLines = nameLabel.split('\n').join('<br>');
-
-    return `<div class="sc sc--${size}" style="background:linear-gradient(145deg,${c1} 0%,${c2} 100%)" title="${brand} ${name}">
+  // Callback cuando imagen falla: primero intenta .png, luego color chip
+  function _onImgError(img) {
+    const src = img.getAttribute('src') || '';
+    if (src.endsWith('.jpg')) {
+      img.setAttribute('src', src.replace('.jpg', '.png'));
+      return;
+    }
+    // Ambas extensiones fallaron → mostrar color chip
+    const div = img.parentElement;
+    if (!div) return;
+    const brand = decodeURIComponent(div.dataset.brand || '');
+    const name  = decodeURIComponent(div.dataset.name  || '');
+    const type  = div.dataset.type  || 'color';
+    const { c1, c2, textColor, brandLabel, lines } = _colorContent(brand, name, type);
+    div.style.background = `linear-gradient(145deg,${c1} 0%,${c2} 100%)`;
+    div.classList.remove('sc--has-img');
+    div.innerHTML = `
       <span class="sc-brand" style="color:${textColor}">${brandLabel}</span>
-      <span class="sc-name" style="color:${textColor}">${nameLines}</span>
+      <span class="sc-name"  style="color:${textColor}">${lines}</span>`;
+  }
+
+  function render(brand, name, type, size = 'md') {
+    const slug = toSlug(brand, name);
+    const bEnc = encodeURIComponent(brand);
+    const nEnc = encodeURIComponent(name);
+    return `<div class="sc sc--${size} sc--has-img"
+      title="${brand} ${name}"
+      data-brand="${bEnc}" data-name="${nEnc}" data-type="${type}" data-size="${size}">
+      <img src="imgs/stock/${slug}.jpg"
+           class="sc-img"
+           alt="${brand} ${name}"
+           onerror="StockChip._onImgError(this)">
     </div>`;
   }
 
-  return { render };
+  return { render, toSlug, _onImgError };
 })();
