@@ -63,7 +63,7 @@ const Modal = (() => {
 // ============================================================
 
 const App = (() => {
-  const views = ['dashboard', 'cameras', 'lenses', 'films', 'film-detail'];
+  const views = ['dashboard', 'cameras', 'lenses', 'films', 'film-detail', 'timeline'];
   let currentView = 'dashboard';
 
   function navigate(view) {
@@ -76,11 +76,12 @@ const App = (() => {
       link.classList.toggle('active', link.dataset.view === navView);
     });
     document.getElementById('page-title').textContent = {
-      dashboard:   'Panel de control',
-      cameras:     'Cámaras',
-      lenses:      'Lentes',
-      films:       'Rollos',
+      dashboard:     'Panel de control',
+      cameras:       'Cámaras',
+      lenses:        'Lentes',
+      films:         'Rollos',
       'film-detail': 'Detalle del rollo',
+      timeline:      'Línea de tiempo',
     }[view] || view;
 
     // Close mobile sidebar
@@ -94,6 +95,7 @@ const App = (() => {
       case 'lenses':      Lenses.render();      break;
       case 'films':       Films.render();       break;
       case 'film-detail': FilmDetail.render();  break;
+      case 'timeline':    Timeline.render();    break;
     }
   }
 

@@ -569,6 +569,6 @@ const Films = (() => {
     load, getAll, save, render, openModal, openEdit, bindUI,
     onFormatChange, onBrandChange, onNameChange, onCameraChange,
     remove, confirmDelete,
-    STATUS_CONFIG, FILM_STATUS_CFG, statusBadge, filmStatusBadge, formatDate
+    STATUS_CONFIG, FILM_STATUS_CFG, statusBadge, filmStatusBadge, typeBadge, formatDate
   };
 })();

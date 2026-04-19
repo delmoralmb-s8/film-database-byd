@@ -9,33 +9,24 @@ const Dashboard = (() => {
     const cameras = Cameras.getAll();
     const lenses  = Lenses.getAll();
 
-    const inCam    = films.filter(f => f.current_status === 'en_camara');
-    const inDev    = films.filter(f => f.current_status === 'en_revelado');
-    const done     = films.filter(f => f.current_status === 'finalizado');
-    const scanned  = films.filter(f => f.current_status === 'escaneado');
-    const rancio   = films.filter(f => f.film_status === 'rancio');
+    const inCam   = films.filter(f => f.current_status === 'en_camara');
+    const done    = films.filter(f => f.current_status === 'finalizado');
+    const scanned = films.filter(f => f.current_status === 'escaneado');
 
     // Stats
     document.getElementById('stat-total').textContent   = films.length;
     document.getElementById('stat-in-cam').textContent  = inCam.length;
-    document.getElementById('stat-in-dev').textContent  = inDev.length;
+    document.getElementById('stat-in-dev').textContent  = films.filter(f => f.current_status === 'en_revelado').length;
     document.getElementById('stat-scanned').textContent = scanned.length;
     document.getElementById('stat-cameras').textContent = cameras.length;
     document.getElementById('stat-lenses').textContent  = lenses.length;
 
-    // Rollos en cámara
-    renderCards('dash-in-cam', inCam, '📷 En cámara', inCam.length === 0);
-
-    // Rollos rancios
-    renderCards('dash-rancio', rancio, '⚠️ Rancios', rancio.length === 0);
-
-    // Rollos en revelado
-    renderCards('dash-in-dev', inDev, '🧪 En revelado', inDev.length === 0);
-
-    renderCards('dash-scanned', scanned.slice(0, 6), '🖼 Por escanear', scanned.length === 0);
+    renderCards('dash-in-cam',  inCam,           inCam.length === 0);
+    renderCards('dash-done',    done.slice(0,6),  done.length === 0);
+    renderCards('dash-scanned', scanned.slice(0,6), scanned.length === 0);
   }
 
-  function renderCards(containerId, list, emptyMsg, isEmpty) {
+  function renderCards(containerId, list, isEmpty) {
     const el = document.getElementById(containerId);
     if (!el) return;
     if (isEmpty) {
