@@ -10,20 +10,22 @@ const Dashboard = (() => {
     const lenses  = Lenses.getAll();
 
     const inCam   = films.filter(f => f.current_status === 'en_camara');
-    const done    = films.filter(f => f.current_status === 'finalizado');
+    const inDev   = films.filter(f => f.current_status === 'en_revelado');
     const scanned = films.filter(f => f.current_status === 'escaneado');
+    const done    = films.filter(f => f.current_status === 'finalizado');
 
     // Stats
     document.getElementById('stat-total').textContent   = films.length;
     document.getElementById('stat-in-cam').textContent  = inCam.length;
-    document.getElementById('stat-in-dev').textContent  = films.filter(f => f.current_status === 'en_revelado').length;
+    document.getElementById('stat-in-dev').textContent  = inDev.length;
     document.getElementById('stat-scanned').textContent = scanned.length;
     document.getElementById('stat-cameras').textContent = cameras.length;
     document.getElementById('stat-lenses').textContent  = lenses.length;
 
-    renderCards('dash-in-cam',  inCam,           inCam.length === 0);
-    renderCards('dash-done',    done.slice(0,6),  done.length === 0);
+    renderCards('dash-in-cam',  inCam,             inCam.length === 0);
+    renderCards('dash-in-dev',  inDev.slice(0,6),  inDev.length === 0);
     renderCards('dash-scanned', scanned.slice(0,6), scanned.length === 0);
+    renderCards('dash-done',    done.slice(0,6),    done.length === 0);
   }
 
   function renderCards(containerId, list, isEmpty) {

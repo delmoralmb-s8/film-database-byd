@@ -71,7 +71,7 @@ const Films = (() => {
 
   const STATUS_CONFIG = {
     en_camara:   { label: 'En cámara',   cls: 'badge-blue'   },
-    en_revelado: { label: 'En revelado', cls: 'badge-yellow'  },
+    en_revelado: { label: 'Por revelar', cls: 'badge-yellow'  },
     finalizado:  { label: 'Finalizado',  cls: 'badge-green'   },
     escaneado:   { label: 'Por escanear', cls: 'badge-purple'  },
   };
@@ -320,7 +320,12 @@ const Films = (() => {
               ? `<option value="__import_cameras__">📷 ¿Quieres importar las cámaras de nuestro brevísimo catálogo?</option>`
               : cameras.map(c => `<option value="${c.id}" ${defCameraId === c.id ? 'selected' : ''}>${c.brand} ${c.model}</option>`).join('')
             }
+            <option value="__add_camera__">📸 ¿Tu cámara es única y diferente? Añádela aquí</option>
           </select>
+          <div id="f-camera-custom-wrap" class="hidden" style="margin-top:.5rem;display:flex;gap:.5rem">
+            <input id="f-camera-brand" placeholder="Marca (ej. Olympus)" style="flex:1">
+            <input id="f-camera-model" placeholder="Modelo (ej. OM-1)" style="flex:1">
+          </div>
         </div>
         <div class="form-group">
           <label>Lente</label>
@@ -335,7 +340,7 @@ const Films = (() => {
           <label>Estado actual</label>
           <select id="f-status">
             ${sel([
-              ['en_camara','En cámara'],['en_revelado','En revelado'],
+              ['en_camara','En cámara'],['en_revelado','Por revelar'],
               ['finalizado','Finalizado'],['escaneado','Por escanear']
             ], v('current_status','en_camara'))}
           </select>
@@ -448,6 +453,8 @@ const Films = (() => {
 
   async function onCameraChange() {
     const val = document.getElementById('f-camera')?.value;
+    const customWrap = document.getElementById('f-camera-custom-wrap');
+    if (customWrap) customWrap.classList.toggle('hidden', val !== '__add_camera__');
     if (val !== '__import_cameras__') return;
     await Cameras.seedDefaults();
     await Lenses.seedDefaults();
@@ -545,6 +552,23 @@ const Films = (() => {
       wide: true,
       body: formHtml(film, cameras, lenses),
       onSave: async () => {
+        const camVal = document.getElementById('f-camera')?.value;
+        if (camVal === '__add_camera__') {
+          const camBrand = document.getElementById('f-camera-brand')?.value.trim();
+          const camModel = document.getElementById('f-camera-model')?.value.trim();
+          if (!camBrand || !camModel) { Toast.show('Escribe la marca y modelo de tu cámara', 'error'); return false; }
+          const format = document.getElementById('f-format')?.value || '35mm';
+          await Cameras.save({ brand: camBrand, model: camModel, format, type: 'SLR' });
+          await Cameras.load();
+          const newCam = Cameras.getAll().find(c => c.brand === camBrand && c.model === camModel);
+          if (newCam) {
+            const camSel = document.getElementById('f-camera');
+            const opt = document.createElement('option');
+            opt.value = newCam.id;
+            camSel.appendChild(opt);
+            camSel.value = newCam.id;
+          }
+        }
         const form = collectForm(film);
         if (!form.brand || !form.name || !form.iso) {
           Toast.show('Marca, nombre e ISO son obligatorios', 'error'); return false;

@@ -129,7 +129,7 @@
             <div id="stat-in-cam" class="stat-value">0</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">En revelado</div>
+            <div class="stat-label">Por revelar</div>
             <div id="stat-in-dev" class="stat-value">0</div>
           </div>
           <div class="stat-card">
@@ -152,13 +152,18 @@
         </div>
 
         <div class="mt-2">
-          <div class="section-title" style="margin-bottom:.5rem">Finalizados</div>
-          <div id="dash-done"></div>
+          <div class="section-title" style="margin-bottom:.5rem">Por revelar</div>
+          <div id="dash-in-dev"></div>
         </div>
 
         <div class="mt-2">
           <div class="section-title" style="margin-bottom:.5rem">Por escanear</div>
           <div id="dash-scanned"></div>
+        </div>
+
+        <div class="mt-2">
+          <div class="section-title" style="margin-bottom:.5rem">Finalizados</div>
+          <div id="dash-done"></div>
         </div>
 		
         <button id="btn-add-film-dash" class="btn btn-primary" style="width:100%;justify-content:center;padding:.85rem;font-size:1rem;margin-bottom:1.5rem">
@@ -220,7 +225,7 @@
           <select id="filter-status">
             <option value="">Todos los estados</option>
             <option value="en_camara">En cámara</option>
-            <option value="en_revelado">En revelado</option>
+            <option value="en_revelado">Por revelar</option>
             <option value="finalizado">Finalizado</option>
             <option value="escaneado">Por escanear</option>
           </select>
