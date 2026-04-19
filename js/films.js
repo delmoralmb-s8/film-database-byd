@@ -12,14 +12,17 @@ const Films = (() => {
     'Konica','Lucky','SantaColor','ReflxLab','Expired','Otra'
   ];
 
+  const COLOR_EXCL = ['Rollei','Fomapan','Ilford','Washi','Kentmere','Film Ferrania','Ferrania'];
+  const BW_EXCL    = ['Revolog','Dubblefilm','Kono','SantaColor','Svema'];
+
   const FILM_STOCKS = {
     'Kodak': [
       'Portra 160','Portra 400','Portra 800',
       'Ektar 100','Gold 200','ColorPlus 200','UltraMax 400','Pro Image 100',
       'Tri-X 400','T-Max 100','T-Max 400','T-Max 3200',
-      'Vision3 50D','Vision3 250D','Vision3 500T',
+      'Vision3 50D','Vision3 200T','Vision3 250D','Vision3 500T',
       'Kodacolor 100','Kodacolor 200',
-      'EKTACOLOR PRO 160','EKTACOLOR PRO 400','EKTACOLOR PRO 800',
+      'EKTACOLOR PRO 160','EKTACOLOR PRO 200','EKTACOLOR PRO 400','EKTACOLOR PRO 800',
       'Ektachrome E100',
       'EKTAPAN 100','EKTAPAN 400','EKTAPAN P3200',
       'Verita 200D','Vision 3 250D AHU','Vision 3 500T AHU',
@@ -63,6 +66,35 @@ const Films = (() => {
     'SantaColor': ['SantaColor 100','SantaColor 800'],
     'ReflxLab': ['Pro 100','800T','50D','200T','500T','400D','320D AHU','DoubleXX','640T'],
   };
+
+  // Stocks filtrados según Tipo + Marca
+  const STOCKS_BY_TYPE = {
+    slide: {
+      'Kodak':    ['Ektachrome 64T','Ektachrome E100','Elitechrome 100','Ektachrome E200','Ektachrome E400'],
+      'Fujifilm': ['Provia 100F','Provia 400','Provia 1600','Velvia 50','Velvia 100','Astia 100F','Sensia'],
+    },
+    color: {
+      'Kodak': [
+        'Portra 160','Portra 400','Gold 200','ColorPlus 200','UltraMax 400','Pro Image 100',
+        'Vision3 50D','Vision3 200T','Vision3 250D','Vision3 500T',
+        'Kodacolor 100','Kodacolor 200',
+        'EKTACOLOR PRO 160','EKTACOLOR PRO 200','EKTACOLOR PRO 800',
+        'Verita 200D','Vision 3 250D AHU','Vision 3 500T AHU',
+      ],
+      'Fujifilm': FILM_STOCKS['Fujifilm'].filter(s => s !== 'Acros 100 II'),
+    },
+    bw: {
+      'Kodak':    ['Tri-X 400','T-Max 100','T-Max 400','T-Max 3200','EKTAPAN 100','EKTAPAN 400','EKTAPAN P3200'],
+      'Fujifilm': ['Acros 100 II'],
+    },
+  };
+
+  function getBrandListForType(type, format) {
+    if (format === 'Super8') return ['Kodak','Orwo'];
+    if (type === 'slide') return ['Kodak','Fujifilm','Otra'];
+    if (type === 'bw')    return ['Ilford', ...FILM_BRANDS.filter(b => b !== 'Ilford' && !BW_EXCL.includes(b))];
+    return FILM_BRANDS.filter(b => !COLOR_EXCL.includes(b)); // color (default)
+  }
 
   const LABS = [
     'Yo soy mi lab','Pantera','Aborigen','Bengala',
@@ -174,16 +206,11 @@ const Films = (() => {
     'Vision3 50D', 'Vision3 200T', 'Vision3 500T', 'Ektachrome', 'Tri-X Reversal',
   ];
 
-  // Rebuild brand options (Super8 restricts to Kodak/Orwo)
+  // Rebuild brand options and num_photos when format changes
   function onFormatChange() {
     const format      = document.getElementById('f-format')?.value;
     const brandSelect = document.getElementById('f-brand');
     if (!brandSelect) return;
-    const list = format === 'Super8' ? ['Kodak','Orwo'] : FILM_BRANDS;
-    brandSelect.innerHTML = list.map(b =>
-      `<option value="${b}">${b}</option>`
-    ).join('');
-    brandSelect.value = format === 'Super8' ? 'Kodak' : (list[0] || '');
 
     const numPhotos = document.getElementById('f-num-photos');
     if (numPhotos) {
@@ -197,24 +224,54 @@ const Films = (() => {
           `<option value="">—</option>` +
           [['12','12'],['24','24'],['36','36']]
             .map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
-        if (format === '120') numPhotos.value = '12';
+        numPhotos.value = format === '120' ? '12' : '36';
       }
     }
-    onBrandChange();
+
+    if (format === 'Super8') {
+      brandSelect.innerHTML = ['Kodak','Orwo'].map(b =>
+        `<option value="${b}">${b}</option>`
+      ).join('');
+      brandSelect.value = 'Kodak';
+      onBrandChange();
+    } else {
+      onTypeChange();
+    }
   }
 
-  // Rebuild emulsion select based on brand + format
+  // Rebuild emulsion select based on brand + format + type
   function onBrandChange() {
     const brand      = document.getElementById('f-brand')?.value;
     const format     = document.getElementById('f-format')?.value;
+    const type       = document.getElementById('f-type')?.value;
     const nameSelect = document.getElementById('f-name');
     if (!nameSelect) return;
-    const stocks = format === 'Super8' ? SUPER8_STOCKS : (FILM_STOCKS[brand] || []);
+    let stocks;
+    if (format === 'Super8') {
+      stocks = SUPER8_STOCKS;
+    } else if (type && STOCKS_BY_TYPE[type]?.[brand] !== undefined) {
+      stocks = STOCKS_BY_TYPE[type][brand];
+    } else {
+      stocks = FILM_STOCKS[brand] || [];
+    }
     nameSelect.innerHTML =
       `<option value="">— Seleccionar —</option>` +
       stocks.map(s => `<option value="${s}">${s}</option>`).join('') +
       `<option value="__otro__">Otro (escribir)</option>`;
     if (stocks.length) { nameSelect.value = stocks[0]; onNameChange(); }
+  }
+
+  // Rebuild brand list when type changes
+  function onTypeChange() {
+    const type        = document.getElementById('f-type')?.value;
+    const format      = document.getElementById('f-format')?.value;
+    const brandSelect = document.getElementById('f-brand');
+    if (!brandSelect || format === 'Super8') { onBrandChange(); return; }
+    const list    = getBrandListForType(type, format);
+    const current = brandSelect.value;
+    brandSelect.innerHTML = list.map(b => `<option value="${b}">${b}</option>`).join('');
+    brandSelect.value = list.includes(current) ? current : list[0];
+    onBrandChange();
   }
 
   // Show custom input when "Otro", auto-fill ISO from emulsion name
@@ -252,16 +309,18 @@ const Films = (() => {
     const defCountry = isNew ? 'Mexico': v('country');
     const defCity    = isNew ? 'CDMX'  : v('city');
 
-    // Brand list respects Super8 restriction
     const currentFormat = v('format', '35mm');
-    const brandList = currentFormat === 'Super8' ? ['Kodak','Orwo'] : FILM_BRANDS;
-    const currentBrand = v('brand', brandList[0] || '');
+    const currentType   = v('type', 'color');
+    const brandList     = getBrandListForType(currentType, currentFormat);
+    const currentBrand  = brandList.includes(v('brand')) ? v('brand') : (brandList[0] || '');
+    const defNumPhotos  = isNew ? (currentFormat === '120' ? '12' : currentFormat === 'Super8' ? '' : '36') : v('num_photos');
 
     // Emulsion select
-    const stocks = currentFormat === 'Super8' ? SUPER8_STOCKS : (FILM_STOCKS[currentBrand] || []);
+    const rawStocks = currentFormat === 'Super8' ? SUPER8_STOCKS
+      : (STOCKS_BY_TYPE[currentType]?.[currentBrand] ?? FILM_STOCKS[currentBrand] ?? []);
     const currentName = v('name');
-    const nameIsCustom = currentName && !stocks.includes(currentName);
-    const selectValue = nameIsCustom ? '__otro__' : (currentName || (stocks[0] || ''));
+    const nameIsCustom = currentName && !rawStocks.includes(currentName);
+    const selectValue = nameIsCustom ? '__otro__' : (currentName || (rawStocks[0] || ''));
 
     return `
       <div class="form-row-3">
@@ -273,7 +332,7 @@ const Films = (() => {
         </div>
         <div class="form-group">
           <label>Tipo</label>
-          <select id="f-type">
+          <select id="f-type" onchange="Films.onTypeChange()">
             ${sel([['color','Color'],['bw','B&N'],['slide','Diapositiva']], v('type','color'))}
           </select>
         </div>
@@ -295,7 +354,7 @@ const Films = (() => {
           <label>Nombre / Emulsión</label>
           <select id="f-name" onchange="Films.onNameChange()">
             <option value="">— Seleccionar —</option>
-            ${stocks.map(s => `<option value="${s}" ${selectValue === s ? 'selected' : ''}>${s}</option>`).join('')}
+            ${rawStocks.map(s => `<option value="${s}" ${selectValue === s ? 'selected' : ''}>${s}</option>`).join('')}
             <option value="__otro__" ${selectValue === '__otro__' ? 'selected' : ''}>Otro (escribir)</option>
           </select>
           <div id="f-name-custom-wrap" class="${nameIsCustom ? '' : 'hidden'}" style="margin-top:.4rem">
@@ -308,7 +367,7 @@ const Films = (() => {
         <label>Nº fotos</label>
         <select id="f-num-photos">
           <option value="">—</option>
-          ${sel([['12','12'],['24','24'],['36','36']], v('num_photos'))}
+          ${sel([['12','12'],['24','24'],['36','36']], defNumPhotos)}
         </select>
       </div>
       <div class="form-row">
@@ -580,8 +639,7 @@ const Films = (() => {
         return true;
       }
     });
-    // Trigger ISO auto-fill for pre-selected emulsion
-    setTimeout(onNameChange, 0);
+    setTimeout(isNew ? onFormatChange : onNameChange, 0);
   }
 
   function openEdit(id) {
@@ -603,7 +661,7 @@ const Films = (() => {
 
   return {
     load, getAll, save, render, openModal, openEdit, bindUI,
-    onFormatChange, onBrandChange, onNameChange, onCameraChange,
+    onFormatChange, onTypeChange, onBrandChange, onNameChange, onCameraChange,
     remove, confirmDelete,
     STATUS_CONFIG, FILM_STATUS_CFG, statusBadge, filmStatusBadge, typeBadge, formatDate
   };

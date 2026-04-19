@@ -19,8 +19,10 @@ const Dashboard = (() => {
     document.getElementById('stat-in-cam').textContent  = inCam.length;
     document.getElementById('stat-in-dev').textContent  = inDev.length;
     document.getElementById('stat-scanned').textContent = scanned.length;
-    document.getElementById('stat-cameras').textContent = cameras.length;
-    document.getElementById('stat-lenses').textContent  = lenses.length;
+    const usedCamIds  = new Set(films.filter(f => f.camera_id).map(f => f.camera_id));
+    const usedLensIds = new Set(films.filter(f => f.lens_id).map(f => f.lens_id));
+    document.getElementById('stat-cameras').textContent = usedCamIds.size;
+    document.getElementById('stat-lenses').textContent  = usedLensIds.size;
 
     renderCards('dash-in-cam',  inCam,             inCam.length === 0);
     renderCards('dash-in-dev',  inDev.slice(0,6),  inDev.length === 0);
