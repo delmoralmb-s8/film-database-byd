@@ -329,5 +329,5 @@ const Cameras = (() => {
     document.getElementById('btn-seed-cameras')?.addEventListener('click', () => seedDefaults());
   }
 
-  return { load, getAll, render, openModal, openEdit, confirmDelete, bindUI, seedDefaults, onBrandChange, onModelChange };
+  return { load, getAll, save, render, openModal, openEdit, confirmDelete, bindUI, seedDefaults, onBrandChange, onModelChange };
 })();
