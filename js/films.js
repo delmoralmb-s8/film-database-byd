@@ -645,6 +645,7 @@ const Films = (() => {
         <tbody>
           ${list.map(f => `
             <tr>
+              <td class="text-sm">${formatDatetime(f.created_at)}</td>
               <td>
                 <div style="display:flex;gap:.5rem;align-items:center">
                   ${StockChip.render(f.brand, f.name, f.type, 'sm')}
@@ -654,7 +655,6 @@ const Films = (() => {
                   </div>
                 </div>
               </td>
-              <td class="text-sm">${formatDatetime(f.created_at)}</td>
               <td>${typeBadge(f.type)}</td>
               <td>${f.iso || '—'}</td>
               <td><span class="badge badge-yellow">${f.format}</span></td>
