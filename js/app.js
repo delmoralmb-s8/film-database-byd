@@ -131,7 +131,7 @@ const App = (() => {
     });
   }
 
-  return { init, navigate, bindUI };
+  return { init, navigate, bindUI, bindGearTabs };
 })();
 
 // ============================================================
