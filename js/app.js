@@ -63,7 +63,7 @@ const Modal = (() => {
 // ============================================================
 
 const App = (() => {
-  const views = ['dashboard', 'gear', 'films', 'film-detail', 'timeline'];
+  const views = ['dashboard', 'gear', 'films', 'film-detail', 'timeline', 'stats'];
   let currentView = 'dashboard';
 
   function navigate(view) {
@@ -82,6 +82,7 @@ const App = (() => {
       films:         'Rollos',
       'film-detail': 'Detalle del rollo',
       timeline:      'Línea de tiempo',
+      stats:         'Estadísticas',
     }[view] || view;
 
     // Close mobile sidebar
@@ -95,6 +96,7 @@ const App = (() => {
       case 'films':       Films.render();      break;
       case 'film-detail': FilmDetail.render(); break;
       case 'timeline':    Timeline.render();   break;
+      case 'stats':       Stats.render();      break;
     }
   }
 
