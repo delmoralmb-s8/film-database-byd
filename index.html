@@ -116,6 +116,22 @@
 
       <!-- ==================== DASHBOARD ==================== -->
       <section id="dashboard-view" class="view active">
+
+        <!-- Mobile hero (hidden on desktop) -->
+        <div class="mobile-hero">
+          <div class="mobile-hero-text">
+            <p class="mobile-hero-eyebrow">Tu colección</p>
+            <h2 class="mobile-hero-title">Film Database</h2>
+          </div>
+          <span class="mobile-hero-icon">&#127926;</span>
+        </div>
+
+        <!-- Mobile search bar (hidden on desktop) -->
+        <div class="mobile-search-bar" id="mobile-search-trigger">
+          <span class="mobile-search-icon">&#128269;</span>
+          <span class="mobile-search-placeholder">Buscar rollos…</span>
+        </div>
+
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-label">Total rollos</div>
@@ -263,19 +279,19 @@
   <!-- Bottom nav (mobile only) -->
   <nav id="bottom-nav" class="bottom-nav">
     <button class="bottom-nav-item active" data-view="dashboard">
-      <span>&#128202;</span>Panel
+      <span class="bnav-icon">&#128202;</span><span class="nav-label">Panel</span>
     </button>
     <button class="bottom-nav-item" data-view="films">
-      <span>&#127926;</span>Rollos
+      <span class="bnav-icon">&#127926;</span><span class="nav-label">Rollos</span>
     </button>
     <button class="bottom-nav-item bottom-nav-add" id="btn-add-film-mobile">
-      <span class="bottom-nav-plus">+</span>Nuevo
+      <span class="bottom-nav-plus">+</span>
     </button>
     <button class="bottom-nav-item" data-view="gear">
-      <span>&#9881;</span>Gear
+      <span class="bnav-icon">&#9881;</span><span class="nav-label">Gear</span>
     </button>
     <button class="bottom-nav-item" data-view="timeline">
-      <span>&#128338;</span>Timeline
+      <span class="bnav-icon">&#128338;</span><span class="nav-label">Timeline</span>
     </button>
   </nav>
 

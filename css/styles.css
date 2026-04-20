@@ -740,20 +740,237 @@ tbody td {
 }
 
 /* ============================================================
-   Responsive
+   Responsive — Mobile redesign
    ============================================================ */
 @media (max-width: 768px) {
+
+  /* --- Layout base --- */
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
   .sidebar-backdrop.open { display: block; }
-  .main-content { margin-left: 0; padding-bottom: 72px; }
+  .main-content { margin-left: 0; padding-bottom: 80px; }
   .hamburger { display: block; }
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .page-content { padding: 1rem; }
   .bottom-nav { display: flex; }
 
-  /* Tables → card layout on mobile */
+  /* --- Top bar (app header) --- */
+  .top-bar {
+    background: var(--bg);
+    border-bottom: none;
+    padding: .75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .top-bar h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -.03em;
+    color: var(--text);
+  }
+
+  /* --- Page content --- */
+  .page-content {
+    padding: 0 1rem 1rem;
+  }
+
+  /* ============================================================
+     Mobile Hero Banner
+     ============================================================ */
+  .mobile-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 1rem;
+    margin-top: .25rem;
+    box-shadow: 0 8px 24px rgba(28,106,81,.3);
+    overflow: hidden;
+  }
+
+  .mobile-hero-eyebrow {
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: rgba(255,255,255,.7);
+    margin-bottom: .2rem;
+  }
+
+  .mobile-hero-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -.03em;
+  }
+
+  .mobile-hero-icon {
+    font-size: 2.5rem;
+    opacity: .85;
+  }
+
+  /* --- Mobile search bar --- */
+  .mobile-search-bar {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: .65rem 1.1rem;
+    margin-bottom: 1.25rem;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .mobile-search-bar:active { opacity: .7; }
+
+  .mobile-search-icon { font-size: 1rem; color: var(--text-muted); }
+
+  .mobile-search-placeholder {
+    font-size: .875rem;
+    color: var(--text-muted);
+  }
+
+  /* ============================================================
+     Stat cards → horizontal scroll strip
+     ============================================================ */
+  .stats-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: .6rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: .4rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* no grid on mobile */
+    grid-template-columns: unset;
+  }
+
+  .stats-grid::-webkit-scrollbar { display: none; }
+
+  .stat-card {
+    flex: 0 0 auto;
+    min-width: 108px;
+    padding: .85rem 1rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .stat-card .stat-value { font-size: 1.75rem; }
+
+  /* ============================================================
+     Section titles — app-style
+     ============================================================ */
+  .section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    text-transform: none;
+    color: var(--text);
+    margin-bottom: .75rem;
+  }
+
+  /* ============================================================
+     Film cards — 2 col, more visual
+     ============================================================ */
+  .film-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: .6rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .film-card {
+    padding: .85rem .8rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .film-card-title { font-size: .85rem; }
+  .film-card-brand { font-size: .72rem; }
+
+  /* ============================================================
+     Bottom nav — pill active style (reference app)
+     ============================================================ */
+  .bottom-nav {
+    display: flex;
+    border-top: none;
+    box-shadow: 0 -4px 24px rgba(0,0,0,.10);
+    padding: .5rem .75rem calc(.55rem + env(safe-area-inset-bottom));
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+    gap: 4px;
+  }
+
+  [data-theme="dark"] .bottom-nav {
+    box-shadow: 0 -4px 24px rgba(0,0,0,.4);
+  }
+
+  .bottom-nav-item {
+    flex: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: .5rem .7rem;
+    border-radius: 999px;
+    min-width: 44px;
+    transition: var(--transition);
+  }
+
+  /* Icon size */
+  .bottom-nav-item .bnav-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+
+  /* Label hidden when inactive */
+  .bottom-nav-item .nav-label {
+    display: none;
+    font-size: .8rem;
+    font-weight: 600;
+    font-family: var(--font);
+    margin-left: .35rem;
+    white-space: nowrap;
+  }
+
+  /* Active pill */
+  .bottom-nav-item.active {
+    background: var(--primary);
+    color: #fff;
+    padding: .5rem 1.1rem;
+  }
+
+  .bottom-nav-item.active .bnav-icon { font-size: 1.1rem; }
+  .bottom-nav-item.active .nav-label { display: inline; }
+
+  /* FAB add button — no pill, keeps circle */
+  .bottom-nav-add {
+    padding: 0 !important;
+    background: transparent !important;
+    flex-shrink: 0;
+  }
+
+  .bottom-nav-plus {
+    width: 2.6rem;
+    height: 2.6rem;
+    background: var(--primary);
+    color: #fff !important;
+    border-radius: 50%;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem !important;
+    font-weight: 300;
+    line-height: 1;
+    box-shadow: 0 4px 14px rgba(28,106,81,.45);
+  }
+
+  /* ============================================================
+     Tables → card layout on mobile
+     ============================================================ */
   .table-wrapper { border: none; background: transparent; }
   .table-wrapper table { display: block; }
   .table-wrapper thead { display: none; }
@@ -775,6 +992,29 @@ tbody td {
   }
   .table-wrapper tbody td:first-child { font-weight: 600; }
   .table-wrapper tbody td .actions { justify-content: flex-end; width: 100%; }
+
+  /* ============================================================
+     Misc mobile fixes
+     ============================================================ */
+  .page-header { margin-bottom: 1rem; }
+  .page-header h2 { font-size: 1.1rem; }
+
+  .filters-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: .25rem;
+    scrollbar-width: none;
+  }
+  .filters-bar::-webkit-scrollbar { display: none; }
+  .filters-bar select,
+  .filters-bar input { flex-shrink: 0; }
+}
+
+/* Desktop only — hide mobile elements */
+@media (min-width: 769px) {
+  .mobile-hero,
+  .mobile-search-bar { display: none; }
 }
 
 /* ============================================================

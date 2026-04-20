@@ -129,6 +129,11 @@ const App = (() => {
       document.getElementById('sidebar').classList.remove('open');
       document.getElementById('sidebar-backdrop').classList.remove('open');
     });
+
+    const mobileSearch = document.getElementById('mobile-search-trigger');
+    if (mobileSearch) {
+      mobileSearch.addEventListener('click', () => navigate('films'));
+    }
   }
 
   return { init, navigate, bindUI, bindGearTabs };
