@@ -107,9 +107,26 @@ FILM-DATABASE/
   - films.num_photos: añadidos '9','18','4','6','14'
   - cameras.format: añadido 'Super8'
 _
+### Módulo Estadísticas (`js/stats.js`)
+
+Nuevo módulo en sidebar (abajo de Línea de tiempo). 7 secciones:
+
+1. **Hero** — Total rollos · Fotos estimadas · Minutos rodados Super8 (por fps: 9→6m40s, 18→3m20s, 24→2m30s) · Años activo · Formatos usados
+2. **ADN fílmico** — Tipo dominante con barra Color/B&N/Slide · Emulsión #1 con chip grande · Cámara principal
+3. **Actividad por año** — Barras apiladas por formato (35mm verde / 120 violeta `#7c3aed` / Super8 ámbar `#b45309`), indicador de tendencia entre años (↑↓=), tooltip al hover, panel expandible al clic con heatmap mensual + distribución tipo + top emulsión del año
+4. **Rankings dobles** — Top 5 emulsiones con chip + barra de progreso · Top 5 cámaras
+5. **Distribución** — Formatos · Labs · Ciudades (barras horizontales proporcionales)
+6. **Tipos de foto** — Con iconos emoji, barras proporcionales
+7. **Sugerencia inteligente** — Lógica rule-based sin API: cruza tipo dominante, marca favorita, ISO promedio, formato principal y ciudad para generar 2-3 sugerencias con chip visual
+
+**Bug fix clave:** `dateOf` usa `start_date || end_date` (cuándo disparaste, no cuándo revelaste)
+
+**Reactividad:** Stats se recalculan automáticamente al guardar/editar/eliminar rollos, cámaras o lentes si la vista está activa (`Films.load()` + `Stats.render()` en todos los callbacks de save/remove de `films.js`, `cameras.js`, `lenses.js`)
+
+**Mobile:** 2 hero-cards por fila · secciones en columna única · gráfico de años compacto (CHART_H=85px) · panel de detalle en columna · sin tooltips (táctil)
+
 ### Áreas de mejora pendientes
 - Página detalle por rollo
-- Estadísticas avanzadas
 - Exportar CSV
 - Validación fechas (fin < inicio)
 - Sin confirmación al cerrar modal con cambios

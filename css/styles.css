@@ -1738,6 +1738,8 @@ h1, h2, h3, h4 {
   font-weight: 500;
   text-align: center;
   white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 /* Tooltip CSS-only */
@@ -2108,19 +2110,39 @@ h1, h2, h3, h4 {
 
 /* ── Responsive Stats ── */
 @media (max-width: 768px) {
-  .stats-hero-num        { font-size: 1.5rem; }
-  .rankings-grid         { grid-template-columns: 1fr; }
-  .dist-grid             { grid-template-columns: 1fr; }
+  /* Hero: 2 cards por fila, última no se estira sola */
+  .stats-hero-num        { font-size: 1.4rem; }
+  .stats-hero-card       { flex: 1 1 calc(50% - .375rem); }
+
+  /* Secciones: menos padding en pantallas estrechas */
+  .stats-section         { padding: 1rem; margin-bottom: 1rem; }
+  .stats-section-title-row { flex-wrap: wrap; }
+
+  /* ADN — columna full-width, sin flip a row */
   .dna-grid              { flex-direction: column; }
-  .dna-card              { flex-direction: row; text-align: left; gap: .75rem; }
-  .dna-type-bar          { width: 120px; }
-  .dist-label            { width: 80px; }
-  .photo-type-name       { width: 120px; }
-  .heat-cell             { aspect-ratio: unset; height: 28px; }
-  .heat-label            { font-size: .5rem; }
-  .year-detail-split     { grid-template-columns: 1fr; }
-  .year-bar-tooltip      { display: none; } /* táctil: tooltip no aplica */
-  .ycl-hint              { display: none; }
-  .year-chart            { gap: .3rem; height: 140px; }
+  /* dna-card mantiene su layout columna — no aplicar flex-direction:row */
+
+  /* Rankings — columna única */
+  .rankings-grid         { grid-template-columns: 1fr; }
+
+  /* Distribución — columna única */
+  .dist-grid             { grid-template-columns: 1fr; }
+
+  /* Tipos de foto */
+  .photo-type-name       { width: 110px; }
+
+  /* Gráfico de años */
+  .year-chart            { gap: .25rem; height: 145px; overflow: visible; }
   .year-bar-stacked      { max-width: 100%; }
+  .year-bar-tooltip      { display: none; } /* tooltip no aplica en táctil */
+  .ycl-hint              { display: none; }
+
+  /* Heatmap mensual: celdas más compactas */
+  .heat-cell             { aspect-ratio: unset; height: 26px; }
+  .heat-label            { font-size: .48rem; }
+
+  /* Panel de detalle: split a columna */
+  .year-detail-split     { grid-template-columns: 1fr; gap: .85rem; }
+  .year-detail-header    { flex-wrap: wrap; gap: .4rem; }
+  .year-detail-title-group { flex-wrap: wrap; }
 }

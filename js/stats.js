@@ -200,7 +200,7 @@ const Stats = (() => {
     const maxCount = Math.max(...years.map(y => yearData[y].total));
     const peakYear = years.reduce((a, b) => yearData[a].total >= yearData[b].total ? a : b);
 
-    const CHART_H = 130; // px altura máxima de barra
+    const CHART_H = 85; // px altura máxima de barra (trend+count+bar+label caben en 155px)
 
     const barsHTML = years.map((y, i) => {
       const data  = yearData[y];
