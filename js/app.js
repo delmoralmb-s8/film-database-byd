@@ -63,7 +63,7 @@ const Modal = (() => {
 // ============================================================
 
 const App = (() => {
-  const views = ['dashboard', 'cameras', 'lenses', 'films', 'film-detail', 'timeline'];
+  const views = ['dashboard', 'gear', 'films', 'film-detail', 'timeline'];
   let currentView = 'dashboard';
 
   function navigate(view) {
@@ -77,8 +77,7 @@ const App = (() => {
     });
     document.getElementById('page-title').textContent = {
       dashboard:     'Panel de control',
-      cameras:       'Cámaras',
-      lenses:        'Lentes',
+      gear:          'Gear',
       films:         'Rollos',
       'film-detail': 'Detalle del rollo',
       timeline:      'Línea de tiempo',
@@ -90,13 +89,24 @@ const App = (() => {
 
     // Render the active view
     switch (view) {
-      case 'dashboard':   Dashboard.render();   break;
-      case 'cameras':     Cameras.render();     break;
-      case 'lenses':      Lenses.render();      break;
-      case 'films':       Films.render();       break;
-      case 'film-detail': FilmDetail.render();  break;
-      case 'timeline':    Timeline.render();    break;
+      case 'dashboard':   Dashboard.render();  break;
+      case 'gear':        Cameras.render(); Lenses.render(); break;
+      case 'films':       Films.render();      break;
+      case 'film-detail': FilmDetail.render(); break;
+      case 'timeline':    Timeline.render();   break;
     }
+  }
+
+  function bindGearTabs() {
+    document.querySelectorAll('.gear-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.gear;
+        document.querySelectorAll('.gear-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.gear-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(`gear-${target}`).classList.add('active');
+      });
+    });
   }
 
   async function init() {
@@ -162,6 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
   Theme.bindUI();
   Modal.bindUI();
   App.bindUI();
+  App.bindGearTabs();
   Cameras.bindUI();
   Lenses.bindUI();
   Films.bindUI();

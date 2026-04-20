@@ -87,7 +87,7 @@ const Lenses = (() => {
 
   async function render() {
     await load();
-    const wrapper = document.querySelector('#lenses-view .table-wrapper');
+    const wrapper = document.querySelector('#gear-lenses .table-wrapper');
     if (!wrapper) return;
 
     if (!lenses.length) {

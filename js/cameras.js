@@ -187,7 +187,7 @@ const Cameras = (() => {
 
   async function render() {
     await load();
-    const container = document.getElementById('cameras-view');
+    const container = document.getElementById('gear-cameras');
     if (!container) return;
 
     if (!cameras.length) {
