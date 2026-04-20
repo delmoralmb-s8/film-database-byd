@@ -295,6 +295,8 @@ const Cameras = (() => {
         await save(form);
         Toast.show(isEdit ? 'Cámara actualizada' : 'Cámara añadida', 'success');
         await render();
+        await Films.load();
+        if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
         return true;
       }
     });
@@ -319,6 +321,8 @@ const Cameras = (() => {
         await remove(id);
         Toast.show('Cámara eliminada', 'success');
         await render();
+        await Films.load();
+        if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
         return true;
       }
     });

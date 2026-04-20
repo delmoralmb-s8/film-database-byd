@@ -153,6 +153,8 @@ const Lenses = (() => {
         await save(form);
         Toast.show(isEdit ? 'Lente actualizada' : 'Lente añadida', 'success');
         await render();
+        await Films.load();
+        if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
         return true;
       }
     });
@@ -175,6 +177,8 @@ const Lenses = (() => {
         await remove(id);
         Toast.show('Lente eliminada', 'success');
         await render();
+        await Films.load();
+        if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
         return true;
       }
     });
