@@ -202,9 +202,12 @@ const Films = (() => {
     return `${film.lenses.brand} ${film.lenses.focal_length}`;
   }
 
-  const SUPER8_STOCKS = [
-    'Vision3 50D', 'Vision3 200T', 'Vision3 500T', 'Ektachrome', 'Tri-X Reversal',
-  ];
+  function getSuper8Stocks(brand, type) {
+    if (brand === 'Orwo') return ['NC 200', 'UN54'];
+    if (type === 'bw')    return ['Tri-X Reversal'];
+    if (type === 'slide') return ['Ektachrome'];
+    return ['Vision3 50D', 'Vision3 200T', 'Vision3 500T']; // color
+  }
 
   // Rebuild brand options and num_photos when format changes
   function onFormatChange() {
@@ -219,12 +222,18 @@ const Films = (() => {
           `<option value="">—</option>` +
           [['9','9 fps'],['18','18 fps'],['24','24 fps']]
             .map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+      } else if (format === '120') {
+        numPhotos.innerHTML =
+          `<option value="">—</option>` +
+          [['4','4'],['6','6'],['12','12']]
+            .map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+        numPhotos.value = '12';
       } else {
         numPhotos.innerHTML =
           `<option value="">—</option>` +
-          [['12','12'],['24','24'],['36','36']]
+          [['14','14'],['24','24'],['36','36']]
             .map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
-        numPhotos.value = format === '120' ? '12' : '36';
+        numPhotos.value = '36';
       }
     }
 
@@ -248,7 +257,7 @@ const Films = (() => {
     if (!nameSelect) return;
     let stocks;
     if (format === 'Super8') {
-      stocks = SUPER8_STOCKS;
+      stocks = getSuper8Stocks(brand, type);
     } else if (type && STOCKS_BY_TYPE[type]?.[brand] !== undefined) {
       stocks = STOCKS_BY_TYPE[type][brand];
     } else {
@@ -313,10 +322,12 @@ const Films = (() => {
     const currentType   = v('type', 'color');
     const brandList     = getBrandListForType(currentType, currentFormat);
     const currentBrand  = brandList.includes(v('brand')) ? v('brand') : (brandList[0] || '');
-    const defNumPhotos  = isNew ? (currentFormat === '120' ? '12' : currentFormat === 'Super8' ? '' : '36') : v('num_photos');
+    const defNumPhotos  = isNew ? (currentFormat === '120' ? '12' : currentFormat === 'Super8' ? '' : '36')
+                               : v('num_photos');
 
     // Emulsion select
-    const rawStocks = currentFormat === 'Super8' ? SUPER8_STOCKS
+    const rawStocks = currentFormat === 'Super8'
+      ? getSuper8Stocks(currentBrand, currentType)
       : (STOCKS_BY_TYPE[currentType]?.[currentBrand] ?? FILM_STOCKS[currentBrand] ?? []);
     const currentName = v('name');
     const nameIsCustom = currentName && !rawStocks.includes(currentName);
@@ -367,7 +378,11 @@ const Films = (() => {
         <label>Nº fotos</label>
         <select id="f-num-photos">
           <option value="">—</option>
-          ${sel([['12','12'],['24','24'],['36','36']], defNumPhotos)}
+          ${currentFormat === 'Super8'
+            ? sel([['9','9 fps'],['18','18 fps'],['24','24 fps']], defNumPhotos)
+            : currentFormat === '120'
+            ? sel([['4','4'],['6','6'],['12','12']], defNumPhotos)
+            : sel([['14','14'],['24','24'],['36','36']], defNumPhotos)}
         </select>
       </div>
       <div class="form-row">
@@ -570,7 +585,7 @@ const Films = (() => {
       <table>
         <thead><tr>
           <th>Rollo</th><th>Tipo</th><th>ISO</th><th>Formato</th>
-          <th>Cámara</th><th>Estado</th><th>Push/Pull</th><th>Lab</th><th>Inicio</th><th>Fin</th>
+          <th>Cámara</th><th>Estado</th><th>Push/Pull</th><th>Lab</th><th>Fin</th>
           ${hasNotes ? '<th>Notas</th>' : ''}<th></th>
         </tr></thead>
         <tbody>
@@ -592,7 +607,6 @@ const Films = (() => {
               <td>${statusBadge(f.current_status)}</td>
               <td>${f.push_pull !== 'no' ? `<span class="badge badge-yellow">${f.push_pull}</span>` : '<span class="text-muted">—</span>'}</td>
               <td class="text-sm">${f.lab || '—'}</td>
-              <td class="text-sm">${formatDate(f.start_date) || '—'}</td>
               <td class="text-sm">${formatDate(f.end_date) || '—'}</td>
               ${hasNotes ? `<td class="text-sm">${f.notes || ''}</td>` : ''}
               <td>
