@@ -34,6 +34,18 @@ FILM-DATABASE/
   Aquí el resumen para tu `.md`:
 ## Cambios recientes — Film Database
 
+  ### UI / Rediseño (sesión actual)
+  - **Fuente DM Sans**: reemplaza Inter — más redonda y con carácter propio (URL ligera, 940 bytes, sin ejes variables)
+  - **Módulo Gear**: Cámaras y Lentes fusionados en una sola sección con tabs internos (⚙️ Gear en sidebar y bottom nav)
+  - **Bottom nav pill (mobile)**: ítem activo = pastilla verde con icono + nombre; inactivos = solo icono
+  - **Hero banner mobile**: tarjeta verde al tope del dashboard con "TU COLECCIÓN / Film Database"
+  - **Search bar mobile**: pill decorativo que navega a Rollos al tocarlo
+  - **Stat cards mobile**: scroll horizontal en vez de grid 2×3
+  - **Section titles mobile**: más grandes, bold, sin uppercase
+  - **Film cards mobile**: 2 columnas en dashboard
+  - **Filtros mobile**: scroll horizontal sin wrap
+  - **Fix crítico**: URL de Google Fonts con ejes variables (`opsz,ital`) generaba 14KB render-blocking → simplificada a 940 bytes
+
   ### Funcionalidad
   - **Eliminar rollo**: botón 🗑 en tabla de rollos con confirmación "¿Estás seguro que quieres eliminar tu rollo :O ?"
   - **Columna Notas**: aparece en la tabla solo si algún rollo tiene texto en notas
@@ -65,6 +77,35 @@ FILM-DATABASE/
   - Al seleccionar Super8: opciones cambian a 9 fps / 18 fps / 24 fps
   - Al cambiar a otro formato: vuelve a 12 / 24 / 36
   - 120 sigue autoseleccionando 12
+  
+  ### Formulario nuevo rollo
+  - Opción "¿Tu cámara es única?" en select Cámara → abre inputs inline marca/modelo y la guarda al vuelo
+  - Tipo Color: oculta Rollei, Fomapan, Ilford, Washi, Kentmere, Ferrania(s)
+  - Tipo B&W: Ilford primero, oculta Revolog, Dubblefilm, Kono, SantaColor, Svema
+  - Tipo Slide: solo Kodak, Fujifilm, Otra
+  - Kodak/Fujifilm filtran emulsiones según tipo (Color/B&W/Slide)
+  - Super8+Kodak+Color → Vision3 50D/200T/500T | B&W → Tri-X Reversal | Slide → Ektachrome
+  - Super8+Orwo → NC 200, UN54
+  - Nº fotos: 35mm=14/24/36 | 120=4/6/12 | Super8=9/18/24fps (default 36 en 35mm, 12 en 120)
+  - ISO omitido en validación para Super8 (guarda 0)
+  - Stock chip en columna Rollo de la tabla (igual que dashboard)
+
+  ### Dashboard
+  - "En revelado" → "Por revelar" en todo el proyecto
+  - Nueva sección Por revelar en Panel: En cámara → Por revelar → Por escanear → Finalizados
+  - Stat Cámaras/Lentes: cuenta solo las que tienen rollos asociados
+
+  ### Lentes
+  - 10 lentes Genérico al inicio del catálogo: 8mm al 200mm
+
+  ### Tabla Rollos
+  - Columna Inicio eliminada, solo queda Fin
+
+  ### DB (Supabase — requiere SQL manual)
+  - films.format: añadido 'Super8'
+  - films.num_photos: añadidos '9','18','4','6','14'
+  - cameras.format: añadido 'Super8'
+_
 ### Áreas de mejora pendientes
 - Página detalle por rollo
 - Estadísticas avanzadas
