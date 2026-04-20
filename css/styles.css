@@ -743,17 +743,107 @@ tbody td {
    Responsive
    ============================================================ */
 @media (max-width: 768px) {
+
+  /* ---- Layout base ---- */
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
   .sidebar-backdrop.open { display: block; }
-  .main-content { margin-left: 0; padding-bottom: 72px; }
+  .main-content { margin-left: 0; padding-bottom: 80px; }
   .hamburger { display: block; }
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .page-content { padding: 1rem; }
-  .bottom-nav { display: flex; }
+  .page-content { padding: 0 1rem 1.5rem; }
 
-  /* Tables → card layout on mobile */
+  /* ---- Top bar ---- */
+  .top-bar {
+    background: var(--bg);
+    border-bottom: none;
+    padding: .75rem 1rem;
+  }
+  .top-bar h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: -.03em; }
+
+  /* ---- Mobile hero ---- */
+  .mobile-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 1rem;
+    margin-top: .25rem;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(28,106,81,.25);
+  }
+  .mobile-hero-eyebrow {
+    font-size: .68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: rgba(255,255,255,.7);
+    margin-bottom: .15rem;
+  }
+  .mobile-hero-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -.03em;
+  }
+  .mobile-hero-icon { font-size: 2.4rem; }
+
+  /* ---- Mobile search ---- */
+  .mobile-search-bar {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: .65rem 1.1rem;
+    margin-bottom: 1.25rem;
+    cursor: pointer;
+  }
+  .mobile-search-icon { font-size: 1rem; color: var(--text-muted); }
+  .mobile-search-placeholder { font-size: .875rem; color: var(--text-muted); }
+
+  /* ---- Stat cards → horizontal scroll ---- */
+  .stats-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: .6rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: .4rem;
+    scrollbar-width: none;
+  }
+  .stats-grid::-webkit-scrollbar { display: none; }
+  .stat-card { flex: 0 0 auto; min-width: 108px; padding: .85rem 1rem; }
+  .stat-card .stat-value { font-size: 1.75rem; }
+
+  /* ---- Section titles ---- */
+  .section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    text-transform: none;
+    color: var(--text);
+    margin-bottom: .75rem;
+  }
+
+  /* ---- Film cards → 2 columnas ---- */
+  .film-cards { grid-template-columns: 1fr 1fr; gap: .6rem; margin-bottom: 1.5rem; }
+  .film-card { padding: .85rem .8rem; }
+  .film-card-title { font-size: .85rem; }
+
+  /* ---- Filters scroll ---- */
+  .filters-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: .25rem;
+  }
+  .filters-bar::-webkit-scrollbar { display: none; }
+  .filters-bar select, .filters-bar input { flex-shrink: 0; }
+
+  /* ---- Tables → tarjetas ---- */
   .table-wrapper { border: none; background: transparent; }
   .table-wrapper table { display: block; }
   .table-wrapper thead { display: none; }
@@ -775,6 +865,73 @@ tbody td {
   }
   .table-wrapper tbody td:first-child { font-weight: 600; }
   .table-wrapper tbody td .actions { justify-content: flex-end; width: 100%; }
+
+  /* ---- Bottom nav pill ---- */
+  .bottom-nav {
+    display: flex;
+    border-top: none;
+    box-shadow: 0 -4px 20px rgba(0,0,0,.09);
+    padding: .45rem .6rem calc(.5rem + env(safe-area-inset-bottom));
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    gap: 2px;
+  }
+  [data-theme="dark"] .bottom-nav { box-shadow: 0 -4px 20px rgba(0,0,0,.4); }
+
+  .bottom-nav-item {
+    flex: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: .45rem .65rem;
+    border-radius: 999px;
+    min-width: 40px;
+    font-size: 0;           /* oculta label en inactivo */
+  }
+  .bottom-nav-item .bnav-icon { font-size: 1.3rem; line-height: 1; }
+  .bottom-nav-item .nav-label {
+    font-size: .8rem;
+    font-weight: 600;
+    font-family: var(--font);
+    margin-left: .3rem;
+    white-space: nowrap;
+  }
+
+  /* Activo: pill verde con icono + label */
+  .bottom-nav-item.active {
+    background: var(--primary);
+    color: #fff;
+    padding: .45rem 1rem;
+    font-size: .8rem;       /* muestra label */
+  }
+  .bottom-nav-item.active .bnav-icon { font-size: 1.1rem; }
+
+  /* Botón + FAB: mantiene círculo, ignora pill */
+  .bottom-nav-add {
+    padding: 0 !important;
+    background: transparent !important;
+    font-size: 0 !important;
+  }
+  .bottom-nav-plus {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--primary);
+    color: #fff !important;
+    border-radius: 50%;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem !important;
+    font-weight: 300;
+    box-shadow: 0 4px 12px rgba(28,106,81,.4);
+  }
+}
+
+/* Desktop: oculta elementos exclusivos de móvil */
+@media (min-width: 769px) {
+  .mobile-hero, .mobile-search-bar { display: none; }
 }
 
 /* ============================================================
