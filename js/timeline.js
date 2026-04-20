@@ -31,11 +31,44 @@ const Timeline = (() => {
   }
 
   // ── Collapse toggle ──────────────────────────────────────────
+  // Al abrir un año → abre también todos sus meses
   function toggleSection(btn) {
-    const body = btn.nextElementSibling;
-    const open = btn.classList.contains('open');
-    btn.classList.toggle('open', !open);
-    body.style.display = open ? 'none' : '';
+    const body   = btn.nextElementSibling;
+    const isOpen = btn.classList.contains('open');
+    const isYear = !btn.classList.contains('tl-collapse-btn--month');
+
+    btn.classList.toggle('open', !isOpen);
+    body.style.display = isOpen ? 'none' : '';
+
+    if (!isOpen && isYear) {
+      // Expandir todos los meses dentro de este año
+      body.querySelectorAll('.tl-collapse-btn--month').forEach(mBtn => {
+        mBtn.classList.add('open');
+        mBtn.nextElementSibling.style.display = '';
+      });
+    }
+  }
+
+  // ── Colapsar / Expandir todo ─────────────────────────────────
+  function toggleAll(expand) {
+    const panel = document.querySelector('.tl-fmt-panel.active');
+    if (!panel) return;
+    panel.querySelectorAll('.tl-collapse-btn').forEach(btn => {
+      const body = btn.nextElementSibling;
+      if (!body) return;
+      btn.classList.toggle('open', expand);
+      body.style.display = expand ? '' : 'none';
+    });
+    // Actualizar texto del botón
+    const allBtn = document.getElementById('tl-toggle-all-btn');
+    if (allBtn) allBtn.textContent = expand ? 'Colapsar todo' : 'Expandir todo';
+    allBtn?.setAttribute('data-expanded', expand ? '1' : '0');
+  }
+
+  function onToggleAll() {
+    const btn = document.getElementById('tl-toggle-all-btn');
+    const expanded = btn?.getAttribute('data-expanded') === '1';
+    toggleAll(!expanded);
   }
 
   // ── Format tab switch ────────────────────────────────────────
@@ -94,6 +127,8 @@ const Timeline = (() => {
             ${dated.length} rollo${dated.length !== 1 ? 's' : ''} con fecha registrada
           </p>
         </div>
+        <button id="tl-toggle-all-btn" class="btn btn-ghost btn-sm"
+          data-expanded="1" onclick="Timeline.onToggleAll()">Colapsar todo</button>
       </div>
 
       <div class="tl-fmt-tabs">
@@ -204,5 +239,5 @@ const Timeline = (() => {
       </div>`;
   }
 
-  return { render, switchFormat, toggleSection };
+  return { render, switchFormat, toggleSection, onToggleAll };
 })();

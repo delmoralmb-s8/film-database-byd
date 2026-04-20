@@ -68,6 +68,7 @@ const App = (() => {
 
   function navigate(view) {
     currentView = view;
+    sessionStorage.setItem('lastView', view);
     views.forEach(v => {
       document.getElementById(`${v}-view`).classList.toggle('active', v === view);
     });
@@ -112,7 +113,8 @@ const App = (() => {
   async function init() {
     // Load all data upfront for dropdowns
     await Promise.all([Cameras.load(), Lenses.load(), Films.load()]);
-    navigate('dashboard');
+    const savedView = sessionStorage.getItem('lastView') || 'dashboard';
+    navigate(savedView);
   }
 
   function bindUI() {

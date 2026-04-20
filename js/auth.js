@@ -11,11 +11,13 @@ const Auth = (() => {
     const { data: { session } } = await supabase.auth.getSession();
     currentUser = session?.user ?? null;
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange((event, session) => {
       currentUser = session?.user ?? null;
-      if (currentUser) {
+      // Solo reaccionar a login/logout real; TOKEN_REFRESHED y USER_UPDATED
+      // no deben reiniciar la app ni redirigir al dashboard.
+      if (event === 'SIGNED_IN') {
         showApp();
-      } else {
+      } else if (event === 'SIGNED_OUT') {
         showAuth();
       }
     });

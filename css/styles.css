@@ -1088,6 +1088,17 @@ h1, h2, h3, h4 {
 .gear-panel { display: none; }
 .gear-panel.active { display: block; }
 
+/* ── Sortable table headers ── */
+.th-sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.th-sortable:hover { color: var(--text); background: var(--card-hover); }
+.th-sortable.th-active { color: var(--primary); }
+.th-sort-icon { font-size: .8em; opacity: .35; margin-left: 2px; }
+.th-sort-icon.sorted { opacity: 1; color: var(--primary); }
+
 .hidden { display: none !important; }
 .text-muted { color: var(--text-muted); }
 .text-sm { font-size: .8rem; }

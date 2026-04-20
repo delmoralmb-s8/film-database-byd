@@ -548,12 +548,51 @@ const Films = (() => {
     if (defLens) lensSel.value = defLens.id;
   }
 
+  // ---- Sort state ----
+  let _sortCol = 'created_at';
+  let _sortDir = 'desc';
+
+  const _SORT_FN = {
+    name:       (a, b) => (a.name || '').localeCompare(b.name || ''),
+    tipo:       (a, b) => (a.type || '').localeCompare(b.type || ''),
+    iso:        (a, b) => (parseInt(a.iso) || 0) - (parseInt(b.iso) || 0),
+    formato:    (a, b) => (a.format || '').localeCompare(b.format || ''),
+    camara:     (a, b) => cameraName(a).localeCompare(cameraName(b)),
+    estado:     (a, b) => (a.current_status || '').localeCompare(b.current_status || ''),
+    lab:        (a, b) => (a.lab || '').localeCompare(b.lab || ''),
+    fin:        (a, b) => (a.end_date || '').localeCompare(b.end_date || ''),
+    created_at: (a, b) => (a.created_at || '').localeCompare(b.created_at || ''),
+  };
+
+  function toggleSort(col) {
+    if (_sortCol === col) {
+      _sortDir = _sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      _sortCol = col;
+      _sortDir = 'asc';
+    }
+    render();
+  }
+
+  function _sortIcon(col) {
+    if (_sortCol !== col) return `<span class="th-sort-icon">↕</span>`;
+    return `<span class="th-sort-icon sorted">${_sortDir === 'asc' ? '↑' : '↓'}</span>`;
+  }
+
+  function _th(col, label) {
+    return `<th class="th-sortable${_sortCol === col ? ' th-active' : ''}" onclick="Films.toggleSort('${col}')">${label} ${_sortIcon(col)}</th>`;
+  }
+
+  function formatDatetime(str) {
+    if (!str) return '—';
+    const dateStr = str.includes('T') ? str.split('T')[0] : str;
+    return formatDate(dateStr) || '—';
+  }
+
   // ---- Render list ----
 
   async function render() {
     await load();
-    const cameras = Cameras.getAll();
-    const lenses  = Lenses.getAll();
 
     // Apply filters
     const fStatus  = document.getElementById('filter-status')?.value || '';
@@ -568,6 +607,12 @@ const Films = (() => {
     if (fSearch)  list = list.filter(f =>
       `${f.brand} ${f.name} ${f.city} ${f.country}`.toLowerCase().includes(fSearch)
     );
+
+    // Apply sort
+    const sortFn = _SORT_FN[_sortCol];
+    if (sortFn) {
+      list = [...list].sort((a, b) => _sortDir === 'asc' ? sortFn(a, b) : sortFn(b, a));
+    }
 
     const wrapper = document.querySelector('#films-view .table-wrapper');
     if (!wrapper) return;
@@ -585,9 +630,17 @@ const Films = (() => {
     wrapper.innerHTML = `
       <table>
         <thead><tr>
-          <th>Rollo</th><th>Tipo</th><th>ISO</th><th>Formato</th>
-          <th>Cámara</th><th>Estado</th><th>Push/Pull</th><th>Lab</th><th>Fin</th>
-          ${hasNotes ? '<th>Notas</th>' : ''}<th></th>
+          ${_th('name','Rollo')}
+          ${_th('tipo','Tipo')}
+          ${_th('iso','ISO')}
+          ${_th('formato','Formato')}
+          ${_th('camara','Cámara')}
+          ${_th('estado','Estado')}
+          ${_th('lab','Lab')}
+          ${_th('fin','Fin')}
+          ${_th('created_at','Agregado')}
+          ${hasNotes ? '<th>Notas</th>' : ''}
+          <th></th>
         </tr></thead>
         <tbody>
           ${list.map(f => `
@@ -606,9 +659,9 @@ const Films = (() => {
               <td><span class="badge badge-yellow">${f.format}</span></td>
               <td class="text-sm">${cameraName(f)}</td>
               <td>${statusBadge(f.current_status)}</td>
-              <td>${f.push_pull !== 'no' ? `<span class="badge badge-yellow">${f.push_pull}</span>` : '<span class="text-muted">—</span>'}</td>
               <td class="text-sm">${f.lab || '—'}</td>
               <td class="text-sm">${formatDate(f.end_date) || '—'}</td>
+              <td class="text-sm">${formatDatetime(f.created_at)}</td>
               ${hasNotes ? `<td class="text-sm">${f.notes || ''}</td>` : ''}
               <td>
                 <div class="actions">
@@ -690,7 +743,7 @@ const Films = (() => {
   return {
     load, getAll, save, render, openModal, openEdit, bindUI,
     onFormatChange, onTypeChange, onBrandChange, onNameChange, onCameraChange,
-    remove, confirmDelete,
+    remove, confirmDelete, toggleSort,
     STATUS_CONFIG, FILM_STATUS_CFG, statusBadge, filmStatusBadge, typeBadge, formatDate
   };
 })();
