@@ -536,6 +536,7 @@ const Films = (() => {
         Toast.show('Rollo eliminado', 'success');
         await render();
         await Dashboard.render();
+        if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
         return true;
       }
     });
@@ -731,6 +732,7 @@ const Films = (() => {
           Toast.show(isEdit ? 'Rollo actualizado' : 'Rollo añadido', 'success');
           await render();
           await Dashboard.render();
+          if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
           return true;
         } catch (err) {
           Toast.show(err.message || 'Error al guardar el rollo', 'error');
