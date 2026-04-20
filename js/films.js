@@ -586,7 +586,7 @@ const Films = (() => {
                 </div>
               </td>
               <td>${typeBadge(f.type)}</td>
-              <td>${f.iso}</td>
+              <td>${f.iso || '—'}</td>
               <td><span class="badge badge-yellow">${f.format}</span></td>
               <td class="text-sm">${cameraName(f)}</td>
               <td>${statusBadge(f.current_status)}</td>
@@ -616,36 +616,43 @@ const Films = (() => {
       wide: true,
       body: formHtml(film, cameras, lenses),
       onSave: async () => {
-        const camVal = document.getElementById('f-camera')?.value;
-        if (camVal === '__add_camera__') {
-          const camBrand = document.getElementById('f-camera-brand')?.value.trim();
-          const camModel = document.getElementById('f-camera-model')?.value.trim();
-          if (!camBrand || !camModel) { Toast.show('Escribe la marca y modelo de tu cámara', 'error'); return false; }
-          const format = document.getElementById('f-format')?.value || '35mm';
-          await Cameras.save({ brand: camBrand, model: camModel, format, type: 'SLR' });
-          await Cameras.load();
-          const newCam = Cameras.getAll().find(c => c.brand === camBrand && c.model === camModel);
-          if (newCam) {
+        try {
+          const camVal = document.getElementById('f-camera')?.value;
+          if (camVal === '__add_camera__') {
+            const camBrand = document.getElementById('f-camera-brand')?.value.trim();
+            const camModel = document.getElementById('f-camera-model')?.value.trim();
+            if (!camBrand || !camModel) { Toast.show('Escribe la marca y modelo de tu cámara', 'error'); return false; }
+            const format = document.getElementById('f-format')?.value || '35mm';
+            await Cameras.save({ brand: camBrand, model: camModel, format, type: 'SLR' });
+            await Cameras.load();
+            const newCam = Cameras.getAll().find(c => c.brand === camBrand && c.model === camModel);
             const camSel = document.getElementById('f-camera');
-            const opt = document.createElement('option');
-            opt.value = newCam.id;
-            camSel.appendChild(opt);
-            camSel.value = newCam.id;
+            // Si no se encontró la cámara recién creada, limpiar el select para no mandar un ID inválido
+            camSel.value = newCam ? newCam.id : '';
+            if (newCam) {
+              const opt = document.createElement('option');
+              opt.value = newCam.id;
+              camSel.appendChild(opt);
+              camSel.value = newCam.id;
+            }
           }
+          const form = collectForm(film);
+          const needsIso = form.format !== 'Super8';
+          if (!form.brand || !form.name || (needsIso && !form.iso)) {
+            Toast.show('Marca y nombre son obligatorios', 'error'); return false;
+          }
+          await save(form);
+          Toast.show(isEdit ? 'Rollo actualizado' : 'Rollo añadido', 'success');
+          await render();
+          await Dashboard.render();
+          return true;
+        } catch (err) {
+          Toast.show(err.message || 'Error al guardar el rollo', 'error');
+          return false;
         }
-        const form = collectForm(film);
-        const needsIso = form.format !== 'Super8';
-        if (!form.brand || !form.name || (needsIso && !form.iso)) {
-          Toast.show('Marca y nombre son obligatorios', 'error'); return false;
-        }
-        await save(form);
-        Toast.show(isEdit ? 'Rollo actualizado' : 'Rollo añadido', 'success');
-        await render();
-        await Dashboard.render();
-        return true;
       }
     });
-    setTimeout(isNew ? onFormatChange : onNameChange, 0);
+    setTimeout(!film ? onFormatChange : onNameChange, 0);
   }
 
   function openEdit(id) {
