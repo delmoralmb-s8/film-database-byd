@@ -51,6 +51,20 @@ FILM-DATABASE/
   - **Transiciones**: `cubic-bezier(0.4, 0, 0.2, 1)` en todo
   - **Headings**: `letter-spacing: -0.025em`
   - **Botones**: `scale(0.97)` en `:active`, focus ring verde
+  ## Imágenes añadidas (33 stocks)
+
+ - Corregidos 3 nombres: velvia-100f → velvia-100, ultramax copia → ultramax-400, borrado duplicado de Ektachrome stocksMeta.js — nuevos colores de chip
+- Kodak: Vision3 200T, Ektachrome (S8), Tri-X Reversal, Kodacolor 100/200
+  - Lucky Lucky 200, SantaColor 100/800
+  - Orwo completo: Wolfenc NC 200/400/500, UN54, NP100 + stocks Super8 (Vision3, Ektachrome, Tri-X Reversal)
+  - README.md imgs/stock/README.md
+
+  - Añadidas secciones: Kentmere, Lucky, SantaColor, Super8 Kodak, Super8 Orwo, Orwo 35mm
+  - films.js — dropdown Nº fotos
+
+  - Al seleccionar Super8: opciones cambian a 9 fps / 18 fps / 24 fps
+  - Al cambiar a otro formato: vuelve a 12 / 24 / 36
+  - 120 sigue autoseleccionando 12
 ### Áreas de mejora pendientes
 - Página detalle por rollo
 - Estadísticas avanzadas
