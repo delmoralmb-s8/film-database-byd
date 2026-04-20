@@ -577,8 +577,13 @@ const Films = (() => {
           ${list.map(f => `
             <tr>
               <td>
-                <div style="font-weight:600">${f.name}</div>
-                <div class="text-muted text-sm">${f.brand}</div>
+                <div style="display:flex;gap:.5rem;align-items:center">
+                  ${StockChip.render(f.brand, f.name, f.type, 'sm')}
+                  <div>
+                    <div style="font-weight:600">${f.name}</div>
+                    <div class="text-muted text-sm">${f.brand}</div>
+                  </div>
+                </div>
               </td>
               <td>${typeBadge(f.type)}</td>
               <td>${f.iso}</td>
