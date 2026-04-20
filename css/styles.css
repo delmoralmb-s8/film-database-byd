@@ -1653,55 +1653,246 @@ h1, h2, h3, h4 {
   flex-shrink: 0;
 }
 
-/* ── ③ Gráfico de barras por año ── */
+/* ── ③ Gráfico de barras apiladas por año ── */
+.stats-section-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: .75rem;
+  margin-bottom: 1.1rem;
+}
+
+.stats-section-title-row .stats-section-title {
+  margin-bottom: 0;
+}
+
+.year-no-date {
+  font-size: .72rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 .year-chart {
   display: flex;
   align-items: flex-end;
-  gap: .6rem;
-  height: 130px;
-  padding-bottom: .25rem;
-  margin-bottom: .75rem;
+  gap: .5rem;
+  height: 155px; /* espacio para etiquetas y tendencias */
+  margin-bottom: .85rem;
 }
 
 .year-bar-wrap {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: .25rem;
+  gap: .2rem;
   flex: 1;
+  cursor: pointer;
+  border-radius: var(--radius);
+  padding: .25rem .15rem .25rem;
+  transition: background var(--transition);
 }
+
+.year-bar-wrap:hover { background: var(--card-hover); }
+.year-bar-wrap--selected { background: var(--card); outline: 2px solid var(--primary); outline-offset: 1px; }
+.year-bar-wrap--peak  .year-bar-stacked { filter: brightness(1.08); }
+
+/* Tendencia */
+.year-trend {
+  font-size: .6rem;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 1px 4px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.year-trend--up { color: #16a34a; background: rgba(22,163,74,.12); }
+.year-trend--dn { color: var(--danger); background: rgba(220,38,38,.1); }
+.year-trend--eq { color: var(--text-muted); background: var(--card); }
 
 .year-bar-count {
   font-size: .68rem;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-weight: 700;
+  color: var(--text-dim);
 }
 
-.year-bar {
+/* Barra apilada */
+.year-bar-stacked {
   width: 100%;
-  max-width: 42px;
-  background: var(--primary-dim);
-  border-radius: 4px 4px 2px 2px;
-  transition: height .4s ease;
+  max-width: 44px;
+  display: flex;
+  flex-direction: column-reverse; /* 35mm en la base, S8 arriba */
+  border-radius: 5px 5px 2px 2px;
+  overflow: hidden;
+  transition: filter var(--transition);
 }
 
-.year-bar--active {
-  background: var(--primary);
-}
+/* Segmentos por formato */
+.yseg          { min-height: 2px; transition: flex .4s ease; }
+.yseg--35mm    { background: #1c6a51; }
+.yseg--120     { background: #7c3aed; }
+.yseg--s8      { background: #b45309; }
 
 .year-bar-label {
-  font-size: .68rem;
+  font-size: .63rem;
   color: var(--text-muted);
   font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
 }
 
-.heat-row-label {
+/* Tooltip CSS-only */
+.year-bar-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .45rem .65rem;
+  font-size: .72rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  z-index: 30;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+  color: var(--text);
+}
+
+.year-bar-wrap:hover .year-bar-tooltip { opacity: 1; }
+
+/* Leyenda de formatos */
+.year-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  flex-wrap: wrap;
+  margin-bottom: .6rem;
+}
+
+.ycl-dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.ycl-label {
   font-size: .75rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: .4rem;
+  color: var(--text-dim);
+  margin-right: .5rem;
 }
 
+.ycl-hint {
+  margin-left: auto;
+  font-size: .7rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Panel expandible de detalle por año ── */
+.year-detail-panel {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height .28s cubic-bezier(0.4,0,0.2,1), opacity .22s ease;
+  background: var(--card);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  margin-top: .75rem;
+}
+
+.year-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .85rem 1rem .6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.year-detail-title-group {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  flex-wrap: wrap;
+}
+
+.year-detail-year {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--primary);
+}
+
+.year-detail-total {
+  font-size: .82rem;
+  color: var(--text-muted);
+}
+
+.year-detail-fmt-badges { display: flex; gap: .35rem; flex-wrap: wrap; }
+
+.fmt-badge {
+  font-size: .7rem;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+.fmt-badge.fmt-35mm { background: rgba(28,106,81,.18); color: #1c6a51; }
+.fmt-badge.fmt-120  { background: rgba(124,58,237,.15); color: #7c3aed; }
+.fmt-badge.fmt-s8   { background: rgba(180,83,9,.15); color: #b45309; }
+
+.year-detail-close {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: .85rem;
+  padding: .2rem .5rem;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.year-detail-close:hover { background: var(--card-hover); color: var(--text); }
+
+.year-detail-body {
+  padding: 1rem 1rem .85rem;
+}
+
+.year-detail-sub-title {
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-muted);
+  margin-bottom: .5rem;
+}
+
+.year-detail-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: .25rem;
+}
+
+.year-detail-top-em {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+
+.year-detail-em-name {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.year-detail-em-sub {
+  font-size: .75rem;
+  color: var(--text-muted);
+}
+
+/* Heatmap mensual */
 .heat-row {
   display: flex;
   gap: 4px;
@@ -1718,11 +1909,13 @@ h1, h2, h3, h4 {
   justify-content: center;
   padding-bottom: 3px;
   cursor: default;
+  transition: filter .15s;
 }
+.heat-cell:hover { filter: brightness(1.3); }
 
 .heat-label {
   font-size: .55rem;
-  color: rgba(255,255,255,.7);
+  color: rgba(255,255,255,.75);
   font-weight: 600;
 }
 
@@ -1915,14 +2108,19 @@ h1, h2, h3, h4 {
 
 /* ── Responsive Stats ── */
 @media (max-width: 768px) {
-  .stats-hero-num  { font-size: 1.5rem; }
-  .rankings-grid   { grid-template-columns: 1fr; }
-  .dist-grid       { grid-template-columns: 1fr; }
-  .dna-grid        { flex-direction: column; }
-  .dna-card        { flex-direction: row; text-align: left; gap: .75rem; }
-  .dna-type-bar    { width: 120px; }
-  .dist-label      { width: 80px; }
-  .photo-type-name { width: 120px; }
-  .heat-cell       { aspect-ratio: unset; height: 28px; }
-  .heat-label      { font-size: .5rem; }
+  .stats-hero-num        { font-size: 1.5rem; }
+  .rankings-grid         { grid-template-columns: 1fr; }
+  .dist-grid             { grid-template-columns: 1fr; }
+  .dna-grid              { flex-direction: column; }
+  .dna-card              { flex-direction: row; text-align: left; gap: .75rem; }
+  .dna-type-bar          { width: 120px; }
+  .dist-label            { width: 80px; }
+  .photo-type-name       { width: 120px; }
+  .heat-cell             { aspect-ratio: unset; height: 28px; }
+  .heat-label            { font-size: .5rem; }
+  .year-detail-split     { grid-template-columns: 1fr; }
+  .year-bar-tooltip      { display: none; } /* táctil: tooltip no aplica */
+  .ycl-hint              { display: none; }
+  .year-chart            { gap: .3rem; height: 140px; }
+  .year-bar-stacked      { max-width: 100%; }
 }

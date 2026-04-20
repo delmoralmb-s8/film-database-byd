@@ -24,10 +24,15 @@ const Stats = (() => {
     'de mi ex :(':              '💔',
   };
 
-  function dateOf(f) { return f.end_date || f.start_date || null; }
+  // start_date = cuándo disparaste; end_date = cuándo lo entregaste al lab.
+  // Para agrupar por año usamos cuándo se disparó el rollo.
+  function dateOf(f) { return f.start_date || f.end_date || null; }
+
+  let _activeYear = null;
 
   // ── Render principal ─────────────────────────────────────
   function render() {
+    _activeYear = null;
     const films = Films.getAll();
     const el = document.getElementById('stats-view');
     if (!el) return;
@@ -170,43 +175,156 @@ const Stats = (() => {
 
   // ── ③ Actividad por año ──────────────────────────────────
   function buildYearActivity(films) {
-    const yearCount      = {};
-    const yearMonthCount = {};
+    // Agrupa por año con desglose por formato y mes
+    const yearData = {};
+    let sinFecha = 0;
 
     films.forEach(f => {
       const d = dateOf(f);
-      if (!d) return;
-      const [yr, mo] = d.split('-');
-      const y = parseInt(yr), m = parseInt(mo);
-      yearCount[y] = (yearCount[y] || 0) + 1;
-      if (!yearMonthCount[y]) yearMonthCount[y] = {};
-      yearMonthCount[y][m] = (yearMonthCount[y][m] || 0) + 1;
+      if (!d) { sinFecha++; return; }
+      const parts = d.split('-');
+      const y = parseInt(parts[0]);
+      const m = parseInt(parts[1]);
+      if (!yearData[y]) {
+        yearData[y] = { total: 0, fmt: { '35mm': 0, '120': 0, 'Super8': 0 }, months: {}, typeCounts: { color: 0, bw: 0, slide: 0 } };
+      }
+      yearData[y].total++;
+      if (f.format in yearData[y].fmt) yearData[y].fmt[f.format]++;
+      yearData[y].months[m] = (yearData[y].months[m] || 0) + 1;
+      if (f.type in yearData[y].typeCounts) yearData[y].typeCounts[f.type]++;
     });
 
-    const years = Object.keys(yearCount).map(Number).sort();
+    const years = Object.keys(yearData).map(Number).sort();
     if (!years.length) return '';
 
-    const maxCount = Math.max(...Object.values(yearCount));
-    const mostActiveYear = +Object.entries(yearCount).sort((a, b) => b[1] - a[1])[0][0];
+    const maxCount = Math.max(...years.map(y => yearData[y].total));
+    const peakYear = years.reduce((a, b) => yearData[a].total >= yearData[b].total ? a : b);
 
-    const barsHTML = years.map(y => {
-      const count = yearCount[y];
-      const pct   = Math.round(count / maxCount * 100);
-      const isMost = y === mostActiveYear;
+    const CHART_H = 130; // px altura máxima de barra
+
+    const barsHTML = years.map((y, i) => {
+      const data  = yearData[y];
+      const barH  = Math.max(Math.round(data.total / maxCount * CHART_H), 6);
+      const isPeak = y === peakYear;
+
+      // Segmentos flex proporcionales al conteo de cada formato
+      const fmt35  = data.fmt['35mm']   || 0;
+      const fmt120 = data.fmt['120']    || 0;
+      const fmtS8  = data.fmt['Super8'] || 0;
+      const segs = [
+        fmt35  ? `<div class="yseg yseg--35mm" style="flex:${fmt35}"></div>`  : '',
+        fmt120 ? `<div class="yseg yseg--120"  style="flex:${fmt120}"></div>` : '',
+        fmtS8  ? `<div class="yseg yseg--s8"   style="flex:${fmtS8}"></div>`  : '',
+      ].join('');
+
+      // Tendencia vs año anterior
+      let trendHTML = '';
+      if (i > 0) {
+        const prev = yearData[years[i - 1]].total;
+        const diff = data.total - prev;
+        const pct  = Math.round(Math.abs(diff) / prev * 100);
+        if      (diff > 0) trendHTML = `<span class="year-trend year-trend--up">↑${pct}%</span>`;
+        else if (diff < 0) trendHTML = `<span class="year-trend year-trend--dn">↓${pct}%</span>`;
+        else               trendHTML = `<span class="year-trend year-trend--eq">=</span>`;
+      }
+
+      // Tooltip líneas
+      const fmtLine = [fmt35 ? `35mm·${fmt35}` : '', fmt120 ? `120·${fmt120}` : '', fmtS8 ? `S8·${fmtS8}` : ''].filter(Boolean).join('  ');
+
       return `
-        <div class="year-bar-wrap">
-          <div class="year-bar-count">${count}</div>
-          <div class="year-bar${isMost ? ' year-bar--active' : ''}" style="height:${Math.max(pct, 4)}%"></div>
-          <div class="year-bar-label">${y}</div>
+        <div class="year-bar-wrap${isPeak ? ' year-bar-wrap--peak' : ''}"
+             data-year="${y}"
+             onclick="Stats._toggleDetail(${y})">
+          ${trendHTML}
+          <div class="year-bar-count">${data.total}</div>
+          <div class="year-bar-stacked" style="height:${barH}px">${segs}</div>
+          <div class="year-bar-label">${y}${isPeak ? ' 🏆' : ''}</div>
+          <div class="year-bar-tooltip">
+            <strong>${y}</strong> — ${data.total} rollo${data.total !== 1 ? 's' : ''}<br>
+            <span style="opacity:.8">${fmtLine}</span>
+          </div>
         </div>`;
     }).join('');
 
-    const monthCounts = yearMonthCount[mostActiveYear] || {};
-    const maxMonth    = Math.max(...Object.values(monthCounts), 1);
+    const noDateNote = sinFecha ? `<span class="year-no-date">${sinFecha} rollo${sinFecha !== 1 ? 's' : ''} sin fecha</span>` : '';
 
+    return `
+      <div class="stats-section">
+        <div class="stats-section-title-row">
+          <span class="stats-section-title">Actividad por año</span>
+          ${noDateNote}
+        </div>
+        <div class="year-chart">${barsHTML}</div>
+        <div class="year-chart-legend">
+          <span class="ycl-dot" style="background:#1c6a51"></span><span class="ycl-label">35mm</span>
+          <span class="ycl-dot" style="background:#7c3aed"></span><span class="ycl-label">120</span>
+          <span class="ycl-dot" style="background:#b45309"></span><span class="ycl-label">Super 8</span>
+          <span class="ycl-hint">Toca un año para ver el detalle</span>
+        </div>
+        <div id="year-detail-panel" class="year-detail-panel"></div>
+      </div>`;
+  }
+
+  // ── Panel de detalle por año ──────────────────────────────
+  function _toggleDetail(year) {
+    const panel = document.getElementById('year-detail-panel');
+    if (!panel) return;
+
+    // Deselect todas las barras
+    document.querySelectorAll('.year-bar-wrap').forEach(b => b.classList.remove('year-bar-wrap--selected'));
+
+    if (_activeYear === year) {
+      _activeYear = null;
+      panel.style.maxHeight = '0';
+      panel.style.opacity   = '0';
+      setTimeout(() => { panel.innerHTML = ''; }, 250);
+      return;
+    }
+
+    _activeYear = year;
+    document.querySelector(`.year-bar-wrap[data-year="${year}"]`)?.classList.add('year-bar-wrap--selected');
+
+    const films = Films.getAll();
+    const yearFilms = films.filter(f => {
+      const d = dateOf(f);
+      return d && parseInt(d.split('-')[0]) === year;
+    });
+
+    // Conteo mensual
+    const monthCounts = {};
+    yearFilms.forEach(f => {
+      const d = dateOf(f);
+      if (!d) return;
+      const m = parseInt(d.split('-')[1]);
+      monthCounts[m] = (monthCounts[m] || 0) + 1;
+    });
+    const maxMonth = Math.max(...Object.values(monthCounts), 1);
+
+    // Tipo
+    const tc = { color: 0, bw: 0, slide: 0 };
+    yearFilms.forEach(f => { if (f.type in tc) tc[f.type]++; });
+    const tt = yearFilms.length || 1;
+    const cp = Math.round(tc.color / tt * 100);
+    const bp = Math.round(tc.bw    / tt * 100);
+    const sp = Math.round(tc.slide / tt * 100);
+
+    // Top emulsión del año
+    const emulsions = countEmulsions(yearFilms);
+    const topEm = emulsions[0];
+
+    // Badges de formato
+    const fmtCount = {};
+    yearFilms.forEach(f => { if (f.format) fmtCount[f.format] = (fmtCount[f.format] || 0) + 1; });
+    const fmtBadges = Object.entries(fmtCount)
+      .map(([fmt, n]) => {
+        const cls = { '35mm': 'fmt-35mm', '120': 'fmt-120', 'Super8': 'fmt-s8' }[fmt] || '';
+        return `<span class="fmt-badge ${cls}">${FMT_LABELS[fmt] || fmt}: ${n}</span>`;
+      }).join('');
+
+    // Heatmap de los 12 meses
     const heatHTML = MONTHS_ES.map((mo, i) => {
       const count   = monthCounts[i + 1] || 0;
-      const opacity = count ? Math.max(0.15, count / maxMonth) : 0.05;
+      const opacity = count ? Math.max(0.18, count / maxMonth) : 0.06;
       return `
         <div class="heat-cell" title="${mo}: ${count} rollo${count !== 1 ? 's' : ''}"
              style="background:rgba(28,106,81,${opacity.toFixed(2)})">
@@ -214,13 +332,65 @@ const Stats = (() => {
         </div>`;
     }).join('');
 
-    return `
-      <div class="stats-section">
-        <div class="stats-section-title">Actividad por año</div>
-        <div class="year-chart">${barsHTML}</div>
-        <div class="heat-row-label">Mes más activo — ${mostActiveYear}</div>
-        <div class="heat-row">${heatHTML}</div>
+    const topEmHTML = topEm ? `
+      <div class="year-detail-top-em">
+        ${StockChip.render(topEm.brand, topEm.name, topEm.type || 'color', 'sm')}
+        <div>
+          <div class="year-detail-em-name">${topEm.brand} ${topEm.name}</div>
+          <div class="year-detail-em-sub">${topEm.count} rollo${topEm.count !== 1 ? 's' : ''}</div>
+        </div>
+      </div>` : '<span class="stats-empty">—</span>';
+
+    panel.innerHTML = `
+      <div class="year-detail-header">
+        <div class="year-detail-title-group">
+          <span class="year-detail-year">${year}</span>
+          <span class="year-detail-total">${yearFilms.length} rollo${yearFilms.length !== 1 ? 's' : ''}</span>
+          <div class="year-detail-fmt-badges">${fmtBadges}</div>
+        </div>
+        <button class="year-detail-close" onclick="Stats._closeDetail()">✕</button>
+      </div>
+      <div class="year-detail-body">
+        <div class="year-detail-sub-title">Actividad mensual</div>
+        <div class="heat-row" style="margin-bottom:1.1rem">${heatHTML}</div>
+        <div class="year-detail-split">
+          <div>
+            <div class="year-detail-sub-title">Tipo</div>
+            <div class="dna-type-bar" style="height:8px;margin-bottom:.4rem">
+              <div class="dna-bar-seg dna-bar--color" style="width:${cp}%"></div>
+              <div class="dna-bar-seg dna-bar--bw"    style="width:${bp}%"></div>
+              <div class="dna-bar-seg dna-bar--slide" style="width:${sp}%"></div>
+            </div>
+            <div class="dna-type-legend">
+              <span class="dna-dot dna-bar--color"></span>Color ${cp}%
+              <span class="dna-dot dna-bar--bw"    style="margin-left:.5rem"></span>B&N ${bp}%
+              <span class="dna-dot dna-bar--slide" style="margin-left:.5rem"></span>Slide ${sp}%
+            </div>
+          </div>
+          <div>
+            <div class="year-detail-sub-title">Emulsión del año</div>
+            ${topEmHTML}
+          </div>
+        </div>
       </div>`;
+
+    // Animar apertura
+    panel.style.maxHeight = '0';
+    panel.style.opacity   = '0';
+    requestAnimationFrame(() => {
+      panel.style.maxHeight = '600px';
+      panel.style.opacity   = '1';
+    });
+  }
+
+  function _closeDetail() {
+    const panel = document.getElementById('year-detail-panel');
+    if (!panel) return;
+    _activeYear = null;
+    document.querySelectorAll('.year-bar-wrap').forEach(b => b.classList.remove('year-bar-wrap--selected'));
+    panel.style.maxHeight = '0';
+    panel.style.opacity   = '0';
+    setTimeout(() => { panel.innerHTML = ''; }, 250);
   }
 
   // ── ④ Rankings dobles ────────────────────────────────────
@@ -497,5 +667,5 @@ const Stats = (() => {
     return Object.entries(map).sort((a, b) => b[1] - a[1]);
   }
 
-  return { render };
+  return { render, _toggleDetail, _closeDetail };
 })();
