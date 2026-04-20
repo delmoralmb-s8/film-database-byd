@@ -630,6 +630,7 @@ const Films = (() => {
     wrapper.innerHTML = `
       <table>
         <thead><tr>
+          ${_th('created_at','Agregado el: ')}
           ${_th('name','Rollo')}
           ${_th('tipo','Tipo')}
           ${_th('iso','ISO')}
@@ -637,8 +638,7 @@ const Films = (() => {
           ${_th('camara','Cámara')}
           ${_th('estado','Estado')}
           ${_th('lab','Lab')}
-          ${_th('fin','Fin')}
-          ${_th('created_at','Agregado')}
+          ${_th('fin','Finalizado en: ')}
           ${hasNotes ? '<th>Notas</th>' : ''}
           <th></th>
         </tr></thead>
@@ -654,6 +654,7 @@ const Films = (() => {
                   </div>
                 </div>
               </td>
+              <td class="text-sm">${formatDatetime(f.created_at)}</td>
               <td>${typeBadge(f.type)}</td>
               <td>${f.iso || '—'}</td>
               <td><span class="badge badge-yellow">${f.format}</span></td>
@@ -661,7 +662,7 @@ const Films = (() => {
               <td>${statusBadge(f.current_status)}</td>
               <td class="text-sm">${f.lab || '—'}</td>
               <td class="text-sm">${formatDate(f.end_date) || '—'}</td>
-              <td class="text-sm">${formatDatetime(f.created_at)}</td>
+
               ${hasNotes ? `<td class="text-sm">${f.notes || ''}</td>` : ''}
               <td>
                 <div class="actions">
