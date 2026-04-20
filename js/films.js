@@ -13,7 +13,7 @@ const Films = (() => {
   ];
 
   const COLOR_EXCL = ['Rollei','Fomapan','Ilford','Washi','Kentmere','Film Ferrania','Ferrania'];
-  const BW_EXCL    = ['Revolog','Dubblefilm','Kono','SantaColor','Svema'];
+  const BW_EXCL    = ['Revolog','Dubblefilm','Kono','SantaColor','Svema','Harman'];
 
   const FILM_STOCKS = {
     'Kodak': [
@@ -53,6 +53,7 @@ const Films = (() => {
     'Bergger': ['Pancro 400'],
     'Kentmere': ['100','400'],
     'Film Ferrania': ['P30 Alpha'],
+	'Harman': ['Phoenix I','Phoenix II', 'Azure'],
     'Ferrania': ['P33'],
     'Washi': ['A','D','F','S','W','X','Z','V'],
     'Revolog': ['Textura','Volvox','Plexus','Kolor','500nm','800nm','Lazer'],
@@ -60,7 +61,7 @@ const Films = (() => {
     'Kono': ['Rekorder','Monicolor RC','Rotwild'],
     'Svema': ['FN 64','Color 125'],
     'Orwo': ['Wolfenc NC 200','Wolfenc NC 400','Wolfenc NC 500','UN54','NP100'],
-    'Adox': ['CHS 100 II','CMS 20 II','Silvermax 100','Color Mission 200'],
+    'Adox': ['Adox Scala','CHS 100 II','CMS 20 II','Silvermax 100','Color Mission 200'],
     'Konica': ['Centuria 100','Centuria 200'],
     'Lucky': ['Lucky 200'],
     'SantaColor': ['SantaColor 100','SantaColor 800'],
@@ -98,7 +99,7 @@ const Films = (() => {
 
   const LABS = [
     'Yo soy mi lab','Pantera','Aborigen','Bengala',
-    'Foto Hercules','Dichroic','Mexicana Analoga','Foto Ricardo'
+    'Foto Hercules','Dichroic','Mexicana Analoga','Foto Ricardo','LabTank'
   ];
 
   const STATUS_CONFIG = {
