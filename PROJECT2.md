@@ -87,7 +87,8 @@ FILM-DATABASE/
   - Super8+Kodak+Color → Vision3 50D/200T/500T | B&W → Tri-X Reversal | Slide → Ektachrome
   - Super8+Orwo → NC 200, UN54
   - Nº fotos: 35mm=14/24/36 | 120=4/6/12 | Super8=9/18/24fps (default 36 en 35mm, 12 en 120)
-  - ISO omitido en validación para Super8 (guarda 0)
+  - ISO Super8: lookup explícito (Vision3 500T→500, 200T→200, 50D→50, Ektachrome→100, Tri-X Reversal→200) — la regex no matchea números pegados a letras (500T)
+  - Pre-llenado: al abrir "Nuevo rollo" en la misma sesión, el formulario se rellena con los datos del último rollo agregado (lastRoll); solo se guarda en INSERT, no en edición
   - Stock chip en columna Rollo de la tabla (igual que dashboard)
 
   ### Dashboard
