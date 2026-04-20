@@ -4,6 +4,7 @@
 
 const Films = (() => {
   let films = [];
+  let lastRoll = null;
 
   const FILM_BRANDS = [
     'Kodak','Fujifilm','Ilford','Cinestill','Rollei','Lomography',
@@ -284,15 +285,29 @@ const Films = (() => {
     onBrandChange();
   }
 
+  // ISO explícito para stocks cuyo número va pegado a una letra (50D, 200T, 500T)
+  const ISO_LOOKUP = {
+    'Vision3 500T': 500,
+    'Vision3 200T': 200,
+    'Vision3 250D': 250,
+    'Vision3 50D':  50,
+    'Ektachrome':   100,
+    'Tri-X Reversal': 200,
+  };
+
   // Show custom input when "Otro", auto-fill ISO from emulsion name
   function onNameChange() {
-    const val       = document.getElementById('f-name')?.value;
+    const val        = document.getElementById('f-name')?.value;
     const customWrap = document.getElementById('f-name-custom-wrap');
-    const isoField  = document.getElementById('f-iso');
+    const isoField   = document.getElementById('f-iso');
     customWrap?.classList.toggle('hidden', val !== '__otro__');
     if (val && val !== '__otro__' && isoField) {
-      const m = val.match(/\b(50|100|125|160|200|250|320|400|500|800|1600|3200)\b/);
-      if (m) isoField.value = m[1];
+      if (ISO_LOOKUP[val] !== undefined) {
+        isoField.value = ISO_LOOKUP[val];
+      } else {
+        const m = val.match(/\b(50|100|125|160|200|250|320|400|500|800|1600|3200)\b/);
+        if (m) isoField.value = m[1];
+      }
     }
   }
 
@@ -679,11 +694,12 @@ const Films = (() => {
     const isEdit = !!film;
     const cameras = Cameras.getAll();
     const lenses  = Lenses.getAll();
+    const defaults = film ?? (lastRoll ? { ...lastRoll, id: null } : null);
 
     Modal.open({
       title: isEdit ? 'Editar rollo' : 'Nuevo rollo',
       wide: true,
-      body: formHtml(film, cameras, lenses),
+      body: formHtml(defaults, cameras, lenses),
       onSave: async () => {
         try {
           const camVal = document.getElementById('f-camera')?.value;
@@ -711,6 +727,7 @@ const Films = (() => {
             Toast.show('Marca y nombre son obligatorios', 'error'); return false;
           }
           await save(form);
+          if (!isEdit) lastRoll = form;
           Toast.show(isEdit ? 'Rollo actualizado' : 'Rollo añadido', 'success');
           await render();
           await Dashboard.render();
