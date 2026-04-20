@@ -1,40 +1,58 @@
 // ============================================================
-// Timeline — visual roll history
+// Timeline — agrupada por Formato → Año → Mes (colapsable)
 // ============================================================
 
 const Timeline = (() => {
 
-  const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const MONTHS_ES = [
+    'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
+  ];
 
-  function dateOf(film) {
-    return film.end_date || film.start_date || null;
-  }
+  const FORMATS = [
+    { key: '35mm',   label: '35mm',    icon: '&#127902;' },
+    { key: '120',    label: '120',     icon: '&#128247;' },
+    { key: 'Super8', label: 'Super 8', icon: '&#127909;' },
+  ];
 
-  function parseYear(dateStr) {
-    if (!dateStr) return null;
-    return parseInt(dateStr.split('-')[0]);
-  }
+  function dateOf(f) { return f.end_date || f.start_date || null; }
 
-  function formatMonthYear(dateStr) {
-    if (!dateStr) return null;
-    const [y, m] = dateStr.split('-');
-    return `${MONTHS[parseInt(m) - 1]} ${y}`;
+  function parseYM(dateStr) {
+    if (!dateStr) return { year: null, month: null };
+    const parts = dateStr.split('-');
+    return { year: parseInt(parts[0]), month: parseInt(parts[1]) };
   }
 
   function formatDotClass(format) {
-    if (format === '35mm')  return 'tl-dot--35mm';
-    if (format === '120')   return 'tl-dot--120';
+    if (format === '35mm')   return 'tl-dot--35mm';
+    if (format === '120')    return 'tl-dot--120';
     if (format === 'Super8') return 'tl-dot--s8';
     return '';
   }
 
-  function render() {
-    const films = Films.getAll();
+  // ── Collapse toggle ──────────────────────────────────────────
+  function toggleSection(btn) {
+    const body = btn.nextElementSibling;
+    const open = btn.classList.contains('open');
+    btn.classList.toggle('open', !open);
+    body.style.display = open ? 'none' : '';
+  }
 
+  // ── Format tab switch ────────────────────────────────────────
+  function switchFormat(btn) {
+    const fmt = btn.dataset.fmt;
+    document.querySelectorAll('.tl-fmt-tab').forEach(t =>
+      t.classList.toggle('active', t.dataset.fmt === fmt));
+    document.querySelectorAll('.tl-fmt-panel').forEach(p =>
+      p.classList.toggle('active', p.dataset.fmt === fmt));
+  }
+
+  // ── Main render ──────────────────────────────────────────────
+  function render() {
+    const films    = Films.getAll();
     const container = document.getElementById('timeline-view');
     if (!container) return;
 
-    // Only rolls that have a date; sort newest first
     const dated = films
       .filter(f => dateOf(f))
       .sort((a, b) => (dateOf(b) || '').localeCompare(dateOf(a) || ''));
@@ -48,45 +66,120 @@ const Timeline = (() => {
       return;
     }
 
-    // Group by year
-    const byYear = {};
-    dated.forEach(f => {
-      const y = parseYear(dateOf(f)) || 'Sin año';
-      if (!byYear[y]) byYear[y] = [];
-      byYear[y].push(f);
+    // Agrupar: formato → año → mes → rollos
+    const grouped = {};
+    FORMATS.forEach(f => { grouped[f.key] = {}; });
+
+    dated.forEach(film => {
+      const fmt = film.format || '35mm';
+      if (!grouped[fmt]) grouped[fmt] = {};
+      const { year, month } = parseYM(dateOf(film));
+      const y = year  || 'Sin año';
+      const m = month || 0;
+      if (!grouped[fmt][y])    grouped[fmt][y] = {};
+      if (!grouped[fmt][y][m]) grouped[fmt][y][m] = [];
+      grouped[fmt][y][m].push(film);
     });
 
-    const years = Object.keys(byYear).sort((a, b) => b - a);
+    // Primer formato con rollos
+    const firstFmt = FORMATS.find(f =>
+      Object.keys(grouped[f.key]).length
+    )?.key || '35mm';
 
     container.innerHTML = `
-      <div class="page-header" style="margin-bottom:1.5rem">
+      <div class="page-header" style="margin-bottom:1.25rem">
         <div>
           <h2>Línea de tiempo</h2>
-          <p class="text-muted text-sm" style="margin-top:.25rem">${dated.length} rollo${dated.length !== 1 ? 's' : ''} con fecha registrada</p>
+          <p class="text-muted text-sm" style="margin-top:.25rem">
+            ${dated.length} rollo${dated.length !== 1 ? 's' : ''} con fecha registrada
+          </p>
         </div>
       </div>
-      <div class="tl-legend">
-        <span class="tl-legend-item"><span class="tl-dot tl-dot--35mm"></span>35mm</span>
-        <span class="tl-legend-item"><span class="tl-dot tl-dot--120"></span>120</span>
-        <span class="tl-legend-item"><span class="tl-dot tl-dot--s8"></span>Super 8</span>
+
+      <div class="tl-fmt-tabs">
+        ${FORMATS.map(f => {
+          const count = Object.values(grouped[f.key])
+            .reduce((sum, ms) => sum + Object.values(ms)
+              .reduce((s, arr) => s + arr.length, 0), 0);
+          return `
+            <button class="tl-fmt-tab${f.key === firstFmt ? ' active' : ''}"
+              data-fmt="${f.key}" onclick="Timeline.switchFormat(this)">
+              <span class="tl-fmt-icon">${f.icon}</span>
+              <span class="tl-fmt-label">${f.label}</span>
+              ${count ? `<span class="tl-fmt-count">${count}</span>` : ''}
+            </button>`;
+        }).join('')}
       </div>
+
+      ${FORMATS.map(f => `
+        <div class="tl-fmt-panel${f.key === firstFmt ? ' active' : ''}" data-fmt="${f.key}">
+          ${renderPanel(grouped[f.key])}
+        </div>
+      `).join('')}
+    `;
+  }
+
+  // ── Panel de un formato ──────────────────────────────────────
+  function renderPanel(yearData) {
+    const years = Object.keys(yearData).sort((a, b) => b - a);
+
+    if (!years.length) {
+      return `
+        <div class="empty-state" style="padding:2rem 1rem">
+          <div class="empty-icon" style="font-size:1.75rem;opacity:.35">&#127902;</div>
+          <p style="font-size:.875rem">Sin rollos de este formato con fecha registrada.</p>
+        </div>`;
+    }
+
+    return `
       <div class="tl-root">
-        ${years.map(year => `
-          <div class="tl-year-block">
-            <div class="tl-year-label">${year}</div>
-            <div class="tl-entries">
-              ${byYear[year].map(f => entryHtml(f)).join('')}
-            </div>
-          </div>
-        `).join('')}
+        ${years.map((year, yi) => {
+          const monthData = yearData[year];
+          const months    = Object.keys(monthData).map(Number).sort((a, b) => b - a);
+          const total     = months.reduce((s, m) => s + monthData[m].length, 0);
+          const yearOpen  = yi === 0;   // el año más reciente abre por defecto
+
+          return `
+            <div class="tl-year-block">
+              <button class="tl-collapse-btn${yearOpen ? ' open' : ''}"
+                onclick="Timeline.toggleSection(this)">
+                <span class="tl-collapse-year">${year}</span>
+                <span class="tl-collapse-count">${total} rollo${total !== 1 ? 's' : ''}</span>
+                <span class="tl-chevron">&#8250;</span>
+              </button>
+
+              <div class="tl-year-body" style="${yearOpen ? '' : 'display:none'}">
+                ${months.map((month, mi) => {
+                  const entries    = monthData[month];
+                  const monthLabel = month ? MONTHS_ES[month - 1] : 'Sin mes';
+                  const monthOpen  = yearOpen && mi === 0;  // solo el mes más reciente abre
+
+                  return `
+                    <div class="tl-month-block">
+                      <button class="tl-collapse-btn tl-collapse-btn--month${monthOpen ? ' open' : ''}"
+                        onclick="Timeline.toggleSection(this)">
+                        <span class="tl-collapse-month">${monthLabel}</span>
+                        <span class="tl-collapse-count">${entries.length} rollo${entries.length !== 1 ? 's' : ''}</span>
+                        <span class="tl-chevron">&#8250;</span>
+                      </button>
+
+                      <div class="tl-month-body" style="${monthOpen ? '' : 'display:none'}">
+                        <div class="tl-entries">
+                          ${entries.map(f => entryHtml(f)).join('')}
+                        </div>
+                      </div>
+                    </div>`;
+                }).join('')}
+              </div>
+            </div>`;
+        }).join('')}
       </div>`;
   }
 
+  // ── Card de un rollo ─────────────────────────────────────────
   function entryHtml(f) {
-    const d = dateOf(f);
-    const label = formatMonthYear(d) || '—';
     const dotCls = formatDotClass(f.format);
-    const cam = f.cameras ? `${f.cameras.brand} ${f.cameras.model}` : null;
+    const cam    = f.cameras ? `${f.cameras.brand} ${f.cameras.model}` : null;
 
     return `
       <div class="tl-entry" onclick="FilmDetail.open('${f.id}')">
@@ -97,11 +190,9 @@ const Timeline = (() => {
         <div class="tl-card">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">
             <div style="flex:1;min-width:0">
-              <div class="tl-card-date">${label}</div>
               <div class="tl-card-title">${f.name}</div>
               <div class="tl-card-brand">${f.brand}</div>
               <div class="tl-card-badges">
-                <span class="badge badge-yellow">${f.format}</span>
                 ${Films.statusBadge(f.current_status)}
                 ${Films.typeBadge(f.type)}
               </div>
@@ -113,5 +204,5 @@ const Timeline = (() => {
       </div>`;
   }
 
-  return { render };
+  return { render, switchFormat, toggleSection };
 })();

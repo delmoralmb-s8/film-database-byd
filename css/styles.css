@@ -1264,42 +1264,133 @@ h1, h2, h3, h4 {
 }
 
 /* ============================================================
-   Timeline
+   Timeline — formato tabs + colapso año/mes
    ============================================================ */
-.tl-legend {
+
+/* ── Tabs de formato ── */
+.tl-fmt-tabs {
   display: flex;
-  gap: 1.25rem;
-  margin-bottom: 1.75rem;
+  gap: 4px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  margin-bottom: 1.5rem;
 }
 
-.tl-legend-item {
+.tl-fmt-tab {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: .45rem;
-  font-size: .8rem;
+  justify-content: center;
+  gap: .35rem;
+  padding: .5rem .6rem;
+  border-radius: 8px;
+  font-size: .875rem;
+  font-weight: 500;
+  font-family: var(--font);
   color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
 }
 
-.tl-root {
-  max-width: 680px;
+.tl-fmt-tab:hover { color: var(--text); }
+
+.tl-fmt-tab.active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,.12);
 }
 
-.tl-year-block {
-  margin-bottom: 2rem;
-}
+.tl-fmt-icon { font-size: 1rem; line-height: 1; }
+.tl-fmt-label { font-size: .875rem; }
 
-.tl-year-label {
-  font-size: 1rem;
+.tl-fmt-count {
+  background: var(--primary-dim);
+  color: var(--primary);
+  border-radius: 999px;
+  font-size: .68rem;
   font-weight: 700;
-  color: var(--text-dim);
-  letter-spacing: -.02em;
-  margin-bottom: .75rem;
-  padding-left: 2.25rem;
+  padding: .1rem .45rem;
+  min-width: 1.3rem;
+  text-align: center;
+  line-height: 1.6;
 }
 
+.tl-fmt-panel { display: none; }
+.tl-fmt-panel.active { display: block; }
+
+/* ── Botones colapsables (año / mes) ── */
+.tl-collapse-btn {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: .55rem .65rem;
+  border-radius: var(--radius);
+  font-family: var(--font);
+  transition: background var(--transition);
+  text-align: left;
+}
+
+.tl-collapse-btn:hover { background: var(--card); }
+
+.tl-collapse-year {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  color: var(--text);
+}
+
+.tl-collapse-month {
+  font-size: .875rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.tl-collapse-count {
+  font-size: .75rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.tl-chevron {
+  margin-left: auto;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  transition: transform var(--transition);
+  transform: rotate(0deg);
+  display: inline-block;
+  line-height: 1;
+}
+
+.tl-collapse-btn.open .tl-chevron { transform: rotate(90deg); }
+
+/* Botón mes: sangría */
+.tl-collapse-btn--month { padding-left: 1rem; }
+
+/* ── Bloques ── */
+.tl-root { max-width: 680px; }
+
+.tl-year-block { margin-bottom: .35rem; }
+
+.tl-year-body  { padding-bottom: .5rem; }
+
+.tl-month-block { margin-bottom: .15rem; }
+
+.tl-month-body { padding-left: .5rem; }
+
+/* ── Entradas (spine + card) ── */
 .tl-entries {
   display: flex;
   flex-direction: column;
+  padding-left: .5rem;
 }
 
 .tl-entry {
@@ -1312,17 +1403,17 @@ h1, h2, h3, h4 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 2.25rem;
+  width: 2rem;
   flex-shrink: 0;
 }
 
 .tl-dot {
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
-  margin-top: .9rem;
-  border: 2px solid var(--surface);
+  margin-top: .95rem;
+  border: 2px solid var(--bg);
   background: var(--border);
 }
 
@@ -1346,22 +1437,13 @@ h1, h2, h3, h4 {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: .85rem 1rem;
-  margin-bottom: .6rem;
+  margin-bottom: .5rem;
   transition: var(--transition);
 }
 
 .tl-card:hover {
   border-color: var(--primary);
   background: var(--card-hover);
-}
-
-.tl-card-date {
-  font-size: .72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .4px;
-  color: var(--text-muted);
-  margin-bottom: .2rem;
 }
 
 .tl-card-title {
@@ -1384,6 +1466,13 @@ h1, h2, h3, h4 {
   margin-bottom: .3rem;
 }
 
-.tl-card-cam {
-  margin-top: .25rem;
+.tl-card-cam { margin-top: .25rem; }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .tl-fmt-label { display: none; }   /* solo icono + número en mobile */
+  .tl-fmt-tab   { padding: .5rem .4rem; }
+  .tl-fmt-icon  { font-size: 1.15rem; }
+  .tl-root      { max-width: 100%; }
+  .tl-month-body { padding-left: 0; }
 }
