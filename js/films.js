@@ -144,7 +144,7 @@ const Films = (() => {
       brand:          form.brand,
       name:           form.name,
       type:           form.type,
-      iso:            parseInt(form.iso),
+      iso:            parseInt(form.iso) || null,
       format:         form.format,
       camera_id:      form.camera_id || null,
       lens_id:        form.lens_id   || null,
@@ -634,8 +634,9 @@ const Films = (() => {
           }
         }
         const form = collectForm(film);
-        if (!form.brand || !form.name || !form.iso) {
-          Toast.show('Marca, nombre e ISO son obligatorios', 'error'); return false;
+        const needsIso = form.format !== 'Super8';
+        if (!form.brand || !form.name || (needsIso && !form.iso)) {
+          Toast.show('Marca y nombre son obligatorios', 'error'); return false;
         }
         await save(form);
         Toast.show(isEdit ? 'Rollo actualizado' : 'Rollo añadido', 'success');
