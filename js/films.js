@@ -144,7 +144,7 @@ const Films = (() => {
       brand:          form.brand,
       name:           form.name,
       type:           form.type,
-      iso:            parseInt(form.iso) || null,
+      iso:            parseInt(form.iso) || 0,
       format:         form.format,
       camera_id:      form.camera_id || null,
       lens_id:        form.lens_id   || null,
