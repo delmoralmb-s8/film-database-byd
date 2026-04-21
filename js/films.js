@@ -972,7 +972,7 @@ const Films = (() => {
     const preview = document.getElementById('q-chip-preview');
     if (!preview) return;
     if (!brand || !name) { preview.innerHTML = ''; return; }
-    preview.innerHTML = StockChip.render(brand, name, inferTypeFromStock(brand, name), 'md');
+    preview.innerHTML = StockChip.render(brand, name, inferTypeFromStock(brand, name), 'lg');
   }
 
   function onQuickCameraChange() {
