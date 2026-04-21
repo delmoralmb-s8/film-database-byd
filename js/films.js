@@ -91,6 +91,36 @@ const Films = (() => {
     },
   };
 
+  // Brands shown in Quick Mode
+  const QUICK_BRANDS = [
+    'Kodak','Fujifilm','Cinestill','Lomography','Agfa',
+    'Fomapan','Orwo','SantaColor','Lucky','ReflxLab'
+  ];
+
+  function inferTypeFromStock(brand, name) {
+    if (!name) return 'color';
+    if (STOCKS_BY_TYPE.slide[brand]?.includes(name)) return 'slide';
+    if (STOCKS_BY_TYPE.bw[brand]?.includes(name)) return 'bw';
+    const slideKw = ['Velvia','Provia','Astia','Ektachrome','CT Precisa','R100','Sensia'];
+    if (slideKw.some(kw => name.includes(kw))) return 'slide';
+    const bwKw = [
+      'BwXX','Tri-X','T-Max','HP5','FP4','Delta','Pan F','XP2','SFX','Ortho',
+      'APX','UN54','NP100','Lady Grey','Earl Grey','Berlin Kino','Potsdam Kino'
+    ];
+    if (bwKw.some(kw => name.includes(kw))) return 'bw';
+    if (['Ilford','Bergger','Kentmere'].includes(brand)) return 'bw';
+    if (brand === 'Fomapan') return 'bw'; // R100 already caught by slideKw
+    return 'color';
+  }
+
+  function getQuickStocks(brand, format) {
+    if (format === 'Super8') {
+      if (brand === 'Orwo') return ['NC 200', 'UN54'];
+      return ['Vision3 50D', 'Vision3 200T', 'Vision3 500T', 'Ektachrome', 'Tri-X Reversal'];
+    }
+    return FILM_STOCKS[brand] || [];
+  }
+
   function getBrandListForType(type, format) {
     if (format === 'Super8') return ['Kodak','Orwo'];
     if (type === 'slide') return ['Kodak','Fujifilm','Otra'];
@@ -691,7 +721,108 @@ const Films = (() => {
       </table>`;
   }
 
+  // Entry point: Quick Mode for new rolls, Advanced for edits
   function openModal(film = null) {
+    film ? _openAdvancedModal(film) : openQuickModal();
+  }
+
+  function openQuickModal() {
+    const cameras = Cameras.getAll();
+
+    Modal.open({
+      title: 'Añadir rollo',
+      wide: false,
+      saveLabel: 'Crear rollo',
+      body: quickFormHtml(cameras),
+      onSave: async () => {
+        try {
+          const format  = document.getElementById('q-format')?.value || '35mm';
+          const brand   = document.getElementById('q-brand')?.value;
+          const rawName = document.getElementById('q-name')?.value;
+
+          if (!brand || !rawName) {
+            Toast.show('Selecciona una emulsión', 'error');
+            return false;
+          }
+
+          // Inline camera creation
+          let cameraId = document.getElementById('q-camera')?.value || null;
+          if (cameraId === '__add_camera__') {
+            const camBrand = document.getElementById('q-camera-brand')?.value.trim();
+            const camModel = document.getElementById('q-camera-model')?.value.trim();
+            if (!camBrand || !camModel) {
+              Toast.show('Escribe la marca y modelo de tu cámara', 'error');
+              return false;
+            }
+            await Cameras.save({ brand: camBrand, model: camModel, format, type: 'SLR' });
+            await Cameras.load();
+            const newCam = Cameras.getAll().find(c => c.brand === camBrand && c.model === camModel);
+            cameraId = newCam?.id || null;
+          } else if (!cameraId) {
+            cameraId = null;
+          }
+
+          // Generic 28mm lens (fallback: null if user hasn't imported lenses)
+          const genericLens = Lenses.getAll().find(l =>
+            /gen[eé]rico/i.test(l.brand) && /28mm/i.test(l.focal_length)
+          );
+
+          // Defaults
+          const numPhotos = format === '120' ? '12' : format === 'Super8' ? '18' : '36';
+          const today = new Date().toISOString().split('T')[0];
+
+          // ISO resolution (reuse same logic as advanced mode)
+          let iso = 0;
+          if (ISO_LOOKUP[rawName] !== undefined) {
+            iso = ISO_LOOKUP[rawName];
+          } else {
+            const m = rawName.match(/\b(50|100|125|160|200|250|320|400|500|800|1600|3200)\b/);
+            if (m) iso = parseInt(m[1]);
+          }
+
+          const form = {
+            film_status:    'fresh',
+            brand,
+            name:           rawName,
+            type:           inferTypeFromStock(brand, rawName),
+            iso,
+            format,
+            camera_id:      cameraId,
+            lens_id:        genericLens?.id || null,
+            current_status: 'en_camara',
+            push_pull:      'no',
+            num_photos:     numPhotos,
+            start_date:     today,
+            end_date:       null,
+            notes:          document.getElementById('q-notes')?.value.trim() || null,
+            lab:            null,
+            city:           null,
+            country:        null,
+            photo_type:     null,
+          };
+
+          await save(form);
+          lastRoll = form;
+          Toast.show('Rollo añadido', 'success');
+          await render();
+          await Dashboard.render();
+          if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
+          return true;
+        } catch (err) {
+          Toast.show(err.message || 'Error al guardar', 'error');
+          return false;
+        }
+      }
+    });
+
+    setTimeout(() => onQuickBrandChange(), 0);
+  }
+
+  function switchToAdvanced() {
+    _openAdvancedModal(null);
+  }
+
+  function _openAdvancedModal(film = null) {
     const isEdit = !!film;
     const cameras = Cameras.getAll();
     const lenses  = Lenses.getAll();
@@ -713,7 +844,6 @@ const Films = (() => {
             await Cameras.load();
             const newCam = Cameras.getAll().find(c => c.brand === camBrand && c.model === camModel);
             const camSel = document.getElementById('f-camera');
-            // Si no se encontró la cámara recién creada, limpiar el select para no mandar un ID inválido
             camSel.value = newCam ? newCam.id : '';
             if (newCam) {
               const opt = document.createElement('option');
@@ -743,6 +873,89 @@ const Films = (() => {
     setTimeout(!film ? onFormatChange : onNameChange, 0);
   }
 
+  // ---- Quick Mode form ----
+
+  function quickFormHtml(cameras) {
+    const initialStocks = FILM_STOCKS['Kodak'] || [];
+    return `
+      <div class="quick-mode-header">
+        <span class="quick-mode-badge">&#9889; Modo rápido</span>
+        <button type="button" class="btn-link-subtle" onclick="Films.switchToAdvanced()">Modo avanzado &rarr;</button>
+      </div>
+      <div class="form-group">
+        <label>Formato</label>
+        <select id="q-format" onchange="Films.onQuickFormatChange()">
+          <option value="35mm">35mm</option>
+          <option value="120">120</option>
+          <option value="Super8">Super 8</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Marca</label>
+          <select id="q-brand" onchange="Films.onQuickBrandChange()">
+            ${QUICK_BRANDS.map(b => `<option value="${b}">${b}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Emulsión</label>
+          <select id="q-name">
+            <option value="">— Seleccionar —</option>
+            ${initialStocks.map(s => `<option value="${s}">${s}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Cámara <span class="label-optional">(opcional)</span></label>
+        <select id="q-camera" onchange="Films.onQuickCameraChange()">
+          <option value="">— Sin cámara —</option>
+          ${cameras.map(c => `<option value="${c.id}">${c.brand} ${c.model}</option>`).join('')}
+          <option value="__add_camera__">&#128248; ¿Tu cámara es única? Añádela aquí</option>
+        </select>
+        <div id="q-camera-custom-wrap" class="hidden" style="margin-top:.5rem;display:flex;gap:.5rem">
+          <input id="q-camera-brand" placeholder="Marca (ej. Olympus)" style="flex:1">
+          <input id="q-camera-model" placeholder="Modelo (ej. OM-1)" style="flex:1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Notas <span class="label-optional">(opcional)</span></label>
+        <textarea id="q-notes" placeholder="Notas libres…" rows="2"></textarea>
+      </div>`;
+  }
+
+  function onQuickFormatChange() {
+    const format = document.getElementById('q-format')?.value;
+    const brandSel = document.getElementById('q-brand');
+    if (!brandSel) return;
+    if (format === 'Super8') {
+      brandSel.innerHTML = ['Kodak','Orwo'].map(b => `<option value="${b}">${b}</option>`).join('');
+      brandSel.value = 'Kodak';
+    } else {
+      const current = brandSel.value;
+      brandSel.innerHTML = QUICK_BRANDS.map(b => `<option value="${b}">${b}</option>`).join('');
+      if (QUICK_BRANDS.includes(current)) brandSel.value = current;
+    }
+    onQuickBrandChange();
+  }
+
+  function onQuickBrandChange() {
+    const format = document.getElementById('q-format')?.value || '35mm';
+    const brand = document.getElementById('q-brand')?.value;
+    const nameSel = document.getElementById('q-name');
+    if (!nameSel || !brand) return;
+    const stocks = getQuickStocks(brand, format);
+    nameSel.innerHTML =
+      `<option value="">— Seleccionar —</option>` +
+      stocks.map(s => `<option value="${s}">${s}</option>`).join('');
+    if (stocks.length) nameSel.value = stocks[0];
+  }
+
+  function onQuickCameraChange() {
+    const val = document.getElementById('q-camera')?.value;
+    const wrap = document.getElementById('q-camera-custom-wrap');
+    if (wrap) wrap.classList.toggle('hidden', val !== '__add_camera__');
+  }
+
   function openEdit(id) {
     const film = films.find(f => f.id === id);
     if (film) openModal(film);
@@ -763,6 +976,8 @@ const Films = (() => {
   return {
     load, getAll, save, render, openModal, openEdit, bindUI,
     onFormatChange, onTypeChange, onBrandChange, onNameChange, onCameraChange,
+    onQuickFormatChange, onQuickBrandChange, onQuickCameraChange,
+    switchToAdvanced,
     remove, confirmDelete, toggleSort,
     STATUS_CONFIG, FILM_STATUS_CFG, statusBadge, filmStatusBadge, typeBadge, formatDate
   };
