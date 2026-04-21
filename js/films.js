@@ -93,7 +93,7 @@ const Films = (() => {
 
   // Brands shown in Quick Mode
   const QUICK_BRANDS = [
-    'Kodak','Fujifilm','Cinestill','Lomography','Agfa',
+    'Kodak','Fujifilm','Ilford','Cinestill','Lomography','Agfa',
     'Fomapan','Orwo','SantaColor','Lucky','ReflxLab'
   ];
 
