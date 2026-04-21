@@ -822,16 +822,26 @@ const Films = (() => {
     _openAdvancedModal(null);
   }
 
+  function switchToQuick() {
+    openQuickModal();
+  }
+
   function _openAdvancedModal(film = null) {
     const isEdit = !!film;
     const cameras = Cameras.getAll();
     const lenses  = Lenses.getAll();
     const defaults = film ?? (lastRoll ? { ...lastRoll, id: null } : null);
 
+    const modeHeader = !isEdit ? `
+      <div class="quick-mode-header">
+        <span class="quick-mode-badge">&#9881; Modo avanzado</span>
+        <button type="button" class="btn-link-subtle" onclick="Films.switchToQuick()">&larr; Modo r&aacute;pido</button>
+      </div>` : '';
+
     Modal.open({
       title: isEdit ? 'Editar rollo' : 'Nuevo rollo',
       wide: true,
-      body: formHtml(defaults, cameras, lenses),
+      body: modeHeader + formHtml(defaults, cameras, lenses),
       onSave: async () => {
         try {
           const camVal = document.getElementById('f-camera')?.value;
@@ -977,7 +987,7 @@ const Films = (() => {
     load, getAll, save, render, openModal, openEdit, bindUI,
     onFormatChange, onTypeChange, onBrandChange, onNameChange, onCameraChange,
     onQuickFormatChange, onQuickBrandChange, onQuickCameraChange,
-    switchToAdvanced,
+    switchToAdvanced, switchToQuick,
     remove, confirmDelete, toggleSort,
     STATUS_CONFIG, FILM_STATUS_CFG, statusBadge, filmStatusBadge, typeBadge, formatDate
   };
