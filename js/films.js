@@ -360,7 +360,7 @@ const Films = (() => {
       ? (lenses.find(l => /nikkor/i.test(l.brand) && /^50mm f\/1\.4/.test(l.focal_length))?.id ?? lenses.find(l => /nikkor/i.test(l.brand) && /50/.test(l.focal_length))?.id ?? '')
       : v('lens_id');
     const defStart   = isNew ? today   : v('start_date');
-    const defEnd     = isNew ? today   : v('end_date');
+    const defEnd     = isNew ? today   : (v('end_date') || v('start_date') || today);
     const defCountry = isNew ? 'Mexico': v('country');
     const defCity    = isNew ? 'CDMX'  : v('city');
 
@@ -909,12 +909,13 @@ const Films = (() => {
         </div>
         <div class="form-group">
           <label>Emulsión</label>
-          <select id="q-name">
+          <select id="q-name" onchange="Films.onQuickNameChange()">
             <option value="">— Seleccionar —</option>
             ${initialStocks.map(s => `<option value="${s}">${s}</option>`).join('')}
           </select>
         </div>
       </div>
+      <div id="q-chip-preview" style="display:flex;justify-content:center;margin:.5rem 0 .75rem;min-height:58px"></div>
       <div class="form-group">
         <label>Cámara <span class="label-optional">(opcional)</span></label>
         <select id="q-camera" onchange="Films.onQuickCameraChange()">
@@ -958,6 +959,20 @@ const Films = (() => {
       `<option value="">— Seleccionar —</option>` +
       stocks.map(s => `<option value="${s}">${s}</option>`).join('');
     if (stocks.length) nameSel.value = stocks[0];
+    _updateQuickChip();
+  }
+
+  function onQuickNameChange() {
+    _updateQuickChip();
+  }
+
+  function _updateQuickChip() {
+    const brand = document.getElementById('q-brand')?.value;
+    const name  = document.getElementById('q-name')?.value;
+    const preview = document.getElementById('q-chip-preview');
+    if (!preview) return;
+    if (!brand || !name) { preview.innerHTML = ''; return; }
+    preview.innerHTML = StockChip.render(brand, name, inferTypeFromStock(brand, name), 'md');
   }
 
   function onQuickCameraChange() {
@@ -986,7 +1001,7 @@ const Films = (() => {
   return {
     load, getAll, save, render, openModal, openEdit, bindUI,
     onFormatChange, onTypeChange, onBrandChange, onNameChange, onCameraChange,
-    onQuickFormatChange, onQuickBrandChange, onQuickCameraChange,
+    onQuickFormatChange, onQuickBrandChange, onQuickNameChange, onQuickCameraChange,
     switchToAdvanced, switchToQuick,
     remove, confirmDelete, toggleSort,
     STATUS_CONFIG, FILM_STATUS_CFG, statusBadge, filmStatusBadge, typeBadge, formatDate
