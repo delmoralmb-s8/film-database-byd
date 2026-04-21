@@ -125,6 +125,13 @@ Nuevo módulo en sidebar (abajo de Línea de tiempo). 7 secciones:
 
 **Mobile:** 2 hero-cards por fila · secciones en columna única · gráfico de años compacto (CHART_H=85px) · panel de detalle en columna · sin tooltips (táctil)
 
+### Modo Rápido (`films.js`)
+- `openModal()` es ahora dispatcher: nuevo rollo → Quick Mode, edición → Advanced Mode
+- Quick Mode muestra solo 4 campos: Formato, Marca+Emulsión (10 marcas), Cámara (opcional), Notas
+- Defaults automáticos al guardar: `num_photos` (36/12/18fps), `lens_id` Genérico 28mm, `current_status` en_camara, `start_date` hoy, ISO resuelto del nombre de emulsión, tipo (Color/B&N/Slide) inferido
+- Cámara inline: si el usuario escribe una nueva, se inserta en `cameras` y se usa el `id` devuelto
+- Botón "Modo avanzado →" en el header del modal reemplaza el body sin cerrar el modal (`switchToAdvanced()`)
+
 ### Áreas de mejora pendientes
 - Página detalle por rollo
 - Exportar CSV
