@@ -98,6 +98,9 @@
         <span id="theme-label">Modo oscuro</span>
         <span id="theme-icon">🌙</span>
       </button>
+      <button id="btn-change-pass" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-bottom:.25rem">
+        Cambiar contraseña
+      </button>
       <button id="btn-logout" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center">
         Cerrar sesión
       </button>
@@ -314,6 +317,33 @@
     <div class="modal-footer">
       <button id="modal-cancel" class="btn btn-ghost">Cancelar</button>
       <button id="modal-save" class="btn btn-primary">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Cambiar contraseña -->
+<div id="modal-change-pass" class="modal-overlay">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <h3>Cambiar contraseña</h3>
+      <button class="modal-close" aria-label="Cerrar" onclick="document.getElementById('modal-change-pass').classList.remove('open')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-change-pass">
+        <div class="form-group">
+          <label>Nueva contraseña</label>
+          <input id="new-pass" type="password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label>Confirmar nueva contraseña</label>
+          <input id="new-pass2" type="password" placeholder="Repite la contraseña" required autocomplete="new-password">
+        </div>
+        <div id="change-pass-error" class="alert alert-error hidden"></div>
+        <div style="display:flex;gap:.5rem;margin-top:1rem;justify-content:flex-end">
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('modal-change-pass').classList.remove('open')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
