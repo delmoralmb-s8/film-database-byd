@@ -22,10 +22,6 @@
       <p data-i18n="auth_by">Por ByD</p>
     </div>
 
-    <div class="auth-lang-row">
-      <button class="lang-toggle-btn" onclick="I18n.setLang(I18n.getLang() === 'es' ? 'en' : 'es')">EN</button>
-    </div>
-
     <div class="auth-tabs">
       <button class="auth-tab active" data-tab="login" data-i18n="auth_login_tab">Iniciar sesión</button>
       <button class="auth-tab" data-tab="register" data-i18n="auth_register_tab">¡Regístrate!</button>
@@ -62,6 +58,11 @@
       <div id="reg-error" class="alert alert-error hidden"></div>
       <button type="submit" class="btn btn-primary btn-block" style="margin-top:.5rem" data-i18n="auth_register_btn">Crear cuenta</button>
     </form>
+
+    <div class="lang-switcher lang-switcher--auth">
+      <button class="lang-btn" data-lang="es" onclick="I18n.setLang('es')">🇲🇽 ES</button>
+      <button class="lang-btn" data-lang="en" onclick="I18n.setLang('en')">🇺🇸 EN</button>
+    </div>
   </div>
 </div>
 
@@ -102,8 +103,10 @@
         <span id="theme-label" data-i18n="theme_dark">Modo oscuro</span>
         <span id="theme-icon">🌙</span>
       </button>
-      <button class="btn btn-ghost btn-sm lang-toggle-btn" style="width:100%;justify-content:center;margin-bottom:.25rem"
-        onclick="I18n.setLang(I18n.getLang() === 'es' ? 'en' : 'es')">EN</button>
+      <div class="lang-switcher lang-switcher--sidebar">
+        <button class="lang-btn" data-lang="es" onclick="I18n.setLang('es')">🇲🇽 ES</button>
+        <button class="lang-btn" data-lang="en" onclick="I18n.setLang('en')">🇺🇸 EN</button>
+      </div>
       <button id="btn-change-pass" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-bottom:.25rem">
         <span data-i18n="btn_change_pass">Cambiar contraseña</span>
       </button>

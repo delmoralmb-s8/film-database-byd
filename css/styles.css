@@ -109,26 +109,46 @@ a:hover { color: var(--primary-h); }
   margin-top: .25rem;
 }
 
-.auth-lang-row {
+.lang-switcher {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1rem;
+  gap: .5rem;
 }
 
-.lang-toggle-btn {
-  font-size: .75rem;
+.lang-switcher--auth {
+  justify-content: center;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.lang-switcher--sidebar {
+  width: 100%;
+  margin-bottom: .25rem;
+}
+
+.lang-switcher--sidebar .lang-btn {
+  flex: 1;
+}
+
+.lang-btn {
+  font-size: .8rem;
   font-weight: 600;
-  padding: .3rem .75rem;
+  padding: .4rem .9rem;
   border-radius: var(--radius);
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--text-muted);
   cursor: pointer;
-  letter-spacing: .5px;
+  letter-spacing: .3px;
   transition: var(--transition);
 }
 
-.lang-toggle-btn:hover {
+.lang-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.lang-btn.active {
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);

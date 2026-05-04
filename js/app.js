@@ -178,10 +178,10 @@ const Theme = (() => {
 document.addEventListener('DOMContentLoaded', () => {
   I18n.init();
   I18n.apply();
-  // Sync lang toggle buttons to current language
+  // Mark active lang button on load
   const currentLang = I18n.getLang();
-  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
-    btn.textContent = currentLang === 'es' ? 'EN' : 'ES';
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === currentLang);
   });
 
   Theme.init();

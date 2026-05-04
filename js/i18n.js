@@ -715,9 +715,8 @@ const I18n = (() => {
   }
 
   function _updateLangBtns() {
-    const label = lang === 'es' ? 'EN' : 'ES';
-    document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
-      btn.textContent = label;
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
     });
   }
 
