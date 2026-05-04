@@ -15,7 +15,7 @@ const FilmDetail = (() => {
     const el = document.getElementById('film-detail-content');
     if (!el) return;
     if (!film) {
-      el.innerHTML = `<p class="text-muted">Rollo no encontrado.</p>`;
+      el.innerHTML = `<p class="text-muted">${I18n.t('detail_not_found')}</p>`;
       return;
     }
 
@@ -42,68 +42,68 @@ const FilmDetail = (() => {
 
         <div class="detail-badges-row">
           <span class="badge badge-yellow">${film.format}</span>
-          ${film.type === 'color' ? '<span class="badge badge-teal">Color</span>'
-            : film.type === 'bw'  ? '<span class="badge badge-gray">B&N</span>'
-            : '<span class="badge badge-blue">Diapo</span>'}
+          ${film.type === 'color' ? `<span class="badge badge-teal">${I18n.t('type_color')}</span>`
+            : film.type === 'bw'  ? `<span class="badge badge-gray">${I18n.t('type_bw')}</span>`
+            : `<span class="badge badge-blue">${I18n.t('type_slide')}</span>`}
           <span class="badge badge-gray">ISO ${film.iso}</span>
           ${film.push_pull !== 'no' ? `<span class="badge badge-yellow">Push/Pull ${film.push_pull}</span>` : ''}
-          ${film.num_photos ? `<span class="badge badge-gray">${film.num_photos} fotos</span>` : ''}
+          ${film.num_photos ? `<span class="badge badge-gray">${film.num_photos} ${I18n.t('detail_exposures')}</span>` : ''}
         </div>
 
         <div class="detail-grid">
           ${cam ? `
           <div class="detail-row">
             <span class="detail-icon">📷</span>
-            <span class="detail-label">Cámara</span>
+            <span class="detail-label">${I18n.t('detail_camera')}</span>
             <span class="detail-value">${cam}</span>
           </div>` : ''}
           ${lens ? `
           <div class="detail-row">
             <span class="detail-icon">🔭</span>
-            <span class="detail-label">Lente</span>
+            <span class="detail-label">${I18n.t('detail_lens')}</span>
             <span class="detail-value">${lens}</span>
           </div>` : ''}
           ${(film.city || film.country) ? `
           <div class="detail-row">
             <span class="detail-icon">📍</span>
-            <span class="detail-label">Lugar</span>
+            <span class="detail-label">${I18n.t('detail_location')}</span>
             <span class="detail-value">${[film.city, film.country].filter(Boolean).join(', ')}</span>
           </div>` : ''}
           ${start ? `
           <div class="detail-row">
             <span class="detail-icon">📅</span>
-            <span class="detail-label">Inicio</span>
+            <span class="detail-label">${I18n.t('detail_start')}</span>
             <span class="detail-value">${start}</span>
           </div>` : ''}
           ${end ? `
           <div class="detail-row">
             <span class="detail-icon">🏁</span>
-            <span class="detail-label">Fin</span>
+            <span class="detail-label">${I18n.t('detail_end')}</span>
             <span class="detail-value">${end}</span>
           </div>` : ''}
           ${film.lab ? `
           <div class="detail-row">
             <span class="detail-icon">🧪</span>
-            <span class="detail-label">Lab</span>
+            <span class="detail-label">${I18n.t('detail_lab')}</span>
             <span class="detail-value">${film.lab}</span>
           </div>` : ''}
           ${film.photo_type ? `
           <div class="detail-row">
             <span class="detail-icon">🖼</span>
-            <span class="detail-label">Tipo de foto</span>
-            <span class="detail-value">${film.photo_type}</span>
+            <span class="detail-label">${I18n.t('detail_photo_type')}</span>
+            <span class="detail-value">${Films.photoTypeLabel(film.photo_type)}</span>
           </div>` : ''}
         </div>
 
         ${film.notes ? `
         <div class="detail-notes">
-          <div class="detail-notes-label">Notas</div>
+          <div class="detail-notes-label">${I18n.t('detail_notes')}</div>
           <p class="detail-notes-body">${film.notes}</p>
         </div>` : ''}
 
         <div class="detail-actions">
-          <button class="btn btn-ghost" onclick="App.navigate('dashboard')">← Volver</button>
-          <button class="btn btn-primary" onclick="Films.openEdit('${film.id}')">✏️ Editar</button>
+          <button class="btn btn-ghost" onclick="App.navigate('dashboard')">${I18n.t('detail_back')}</button>
+          <button class="btn btn-primary" onclick="Films.openEdit('${film.id}')">${I18n.t('detail_edit')}</button>
         </div>
       </div>`;
   }

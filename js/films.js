@@ -54,7 +54,7 @@ const Films = (() => {
     'Bergger': ['Pancro 400'],
     'Kentmere': ['100','400'],
     'Film Ferrania': ['P30 Alpha'],
-	'Harman': ['Phoenix I','Phoenix II', 'Azure'],
+    'Harman': ['Phoenix I','Phoenix II', 'Azure'],
     'Ferrania': ['P33'],
     'Washi': ['A','D','F','S','W','X','Z','V'],
     'Revolog': ['Textura','Volvox','Plexus','Kolor','500nm','800nm','Lazer'],
@@ -69,7 +69,6 @@ const Films = (() => {
     'ReflxLab': ['Pro 100','800T','50D','200T','500T','400D','320D AHU','DoubleXX','640T'],
   };
 
-  // Stocks filtrados según Tipo + Marca
   const STOCKS_BY_TYPE = {
     slide: {
       'Kodak':    ['Ektachrome 64T','Ektachrome E100','Elitechrome 100','Ektachrome E200','Ektachrome E400'],
@@ -91,7 +90,6 @@ const Films = (() => {
     },
   };
 
-  // Brands shown in Quick Mode
   const QUICK_BRANDS = [
     'Kodak','Fujifilm','Ilford','Cinestill','Lomography','Agfa',
     'Fomapan','Orwo','SantaColor','Lucky','ReflxLab'
@@ -109,7 +107,7 @@ const Films = (() => {
     ];
     if (bwKw.some(kw => name.includes(kw))) return 'bw';
     if (['Ilford','Bergger','Kentmere'].includes(brand)) return 'bw';
-    if (brand === 'Fomapan') return 'bw'; // R100 already caught by slideKw
+    if (brand === 'Fomapan') return 'bw';
     return 'color';
   }
 
@@ -125,7 +123,7 @@ const Films = (() => {
     if (format === 'Super8') return ['Kodak','Orwo'];
     if (type === 'slide') return ['Kodak','Fujifilm','Otra'];
     if (type === 'bw')    return ['Ilford', ...FILM_BRANDS.filter(b => b !== 'Ilford' && !BW_EXCL.includes(b))];
-    return FILM_BRANDS.filter(b => !COLOR_EXCL.includes(b)); // color (default)
+    return FILM_BRANDS.filter(b => !COLOR_EXCL.includes(b));
   }
 
   const LABS = [
@@ -133,24 +131,28 @@ const Films = (() => {
     'Foto Hercules','Dichroic','Mexicana Analoga','Foto Ricardo','LabTank'
   ];
 
-  const STATUS_CONFIG = {
-    en_camara:   { label: 'En cámara',   cls: 'badge-blue'   },
-    en_revelado: { label: 'Por revelar', cls: 'badge-yellow'  },
-    finalizado:  { label: 'Finalizado',  cls: 'badge-green'   },
-    escaneado:   { label: 'Por escanear', cls: 'badge-purple'  },
-  };
+  function statusConfig() {
+    return {
+      en_camara:   { label: I18n.t('status_en_camara'),   cls: 'badge-blue'   },
+      en_revelado: { label: I18n.t('status_en_revelado'), cls: 'badge-yellow'  },
+      finalizado:  { label: I18n.t('status_finalizado'),  cls: 'badge-green'   },
+      escaneado:   { label: I18n.t('status_escaneado'),   cls: 'badge-purple'  },
+    };
+  }
 
   const FILM_STATUS_CFG = {
     fresh:     { label: 'Fresh',     cls: 'badge-green'  },
     cadufresh: { label: 'CaduFresh', cls: 'badge-yellow' },
-    rancio:    { label: 'Rancio',    cls: 'badge-red'    },
+    rancio:    { cls: 'badge-red' },
   };
 
-  const TYPE_CFG = {
-    color: { label: 'Color', cls: 'badge-teal' },
-    bw:    { label: 'B&N',   cls: 'badge-gray' },
-    slide: { label: 'Diapo', cls: 'badge-blue' },
-  };
+  function typeCfg() {
+    return {
+      color: { label: I18n.t('type_color'), cls: 'badge-teal' },
+      bw:    { label: I18n.t('type_bw'),    cls: 'badge-gray' },
+      slide: { label: I18n.t('type_slide'), cls: 'badge-blue' },
+    };
+  }
 
   async function load() {
     const { data, error } = await supabase
@@ -203,25 +205,28 @@ const Films = (() => {
   // ---- Helpers ----
 
   function statusBadge(s) {
-    const c = STATUS_CONFIG[s] || { label: s, cls: 'badge-gray' };
+    const cfg = statusConfig();
+    const c = cfg[s] || { label: s, cls: 'badge-gray' };
     return `<span class="badge ${c.cls}">${c.label}</span>`;
   }
 
   function filmStatusBadge(s) {
     const c = FILM_STATUS_CFG[s] || { label: s, cls: 'badge-gray' };
-    return `<span class="badge ${c.cls}">${c.label}</span>`;
+    const label = s === 'rancio' ? I18n.t('cond_rancio') : (c.label || s);
+    return `<span class="badge ${c.cls}">${label}</span>`;
   }
 
   function typeBadge(t) {
-    const c = TYPE_CFG[t] || { label: t, cls: 'badge-gray' };
+    const cfg = typeCfg();
+    const c = cfg[t] || { label: t, cls: 'badge-gray' };
     return `<span class="badge ${c.cls}">${c.label}</span>`;
   }
 
-  const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   function formatDate(str) {
     if (!str) return null;
     const [y, m, d] = str.split('-');
-    return `${parseInt(d)} ${MONTHS[parseInt(m) - 1]} ${y}`;
+    const months = I18n.t('months_short');
+    return `${parseInt(d)} ${months[parseInt(m) - 1]} ${y}`;
   }
 
   function cameraName(film) {
@@ -238,10 +243,9 @@ const Films = (() => {
     if (brand === 'Orwo') return ['NC 200', 'UN54'];
     if (type === 'bw')    return ['Tri-X Reversal'];
     if (type === 'slide') return ['Ektachrome'];
-    return ['Vision3 50D', 'Vision3 200T', 'Vision3 500T']; // color
+    return ['Vision3 50D', 'Vision3 200T', 'Vision3 500T'];
   }
 
-  // Rebuild brand options and num_photos when format changes
   function onFormatChange() {
     const format      = document.getElementById('f-format')?.value;
     const brandSelect = document.getElementById('f-brand');
@@ -280,7 +284,6 @@ const Films = (() => {
     }
   }
 
-  // Rebuild emulsion select based on brand + format + type
   function onBrandChange() {
     const brand      = document.getElementById('f-brand')?.value;
     const format     = document.getElementById('f-format')?.value;
@@ -296,13 +299,12 @@ const Films = (() => {
       stocks = FILM_STOCKS[brand] || [];
     }
     nameSelect.innerHTML =
-      `<option value="">— Seleccionar —</option>` +
+      `<option value="">${I18n.t('form_select')}</option>` +
       stocks.map(s => `<option value="${s}">${s}</option>`).join('') +
-      `<option value="__otro__">Otro (escribir)</option>`;
+      `<option value="__otro__">${I18n.t('form_other_write')}</option>`;
     if (stocks.length) { nameSelect.value = stocks[0]; onNameChange(); }
   }
 
-  // Rebuild brand list when type changes
   function onTypeChange() {
     const type        = document.getElementById('f-type')?.value;
     const format      = document.getElementById('f-format')?.value;
@@ -315,7 +317,6 @@ const Films = (() => {
     onBrandChange();
   }
 
-  // ISO explícito para stocks cuyo número va pegado a una letra (50D, 200T, 500T)
   const ISO_LOOKUP = {
     'Vision3 500T': 500,
     'Vision3 200T': 200,
@@ -325,7 +326,6 @@ const Films = (() => {
     'Tri-X Reversal': 200,
   };
 
-  // Show custom input when "Otro", auto-fill ISO from emulsion name
   function onNameChange() {
     const val        = document.getElementById('f-name')?.value;
     const customWrap = document.getElementById('f-name-custom-wrap');
@@ -341,6 +341,15 @@ const Films = (() => {
     }
   }
 
+  // ---- Photo type label helper ----
+  function photoTypeLabel(val) {
+    if (!val) return '';
+    const key = `photo_${val}`;
+    const translated = I18n.t(key);
+    // If key not found, return capitalized original
+    return translated !== key ? translated : (val.charAt(0).toUpperCase() + val.slice(1));
+  }
+
   // ---- Modal form HTML ----
 
   function formHtml(film, cameras, lenses) {
@@ -352,7 +361,6 @@ const Films = (() => {
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Smart defaults for new rolls
     const defCameraId = isNew
       ? (cameras.find(c => /nikon/i.test(c.brand) && /f3/i.test(c.model))?.id ?? '')
       : v('camera_id');
@@ -371,7 +379,6 @@ const Films = (() => {
     const defNumPhotos  = isNew ? (currentFormat === '120' ? '12' : currentFormat === 'Super8' ? '' : '36')
                                : v('num_photos');
 
-    // Emulsion select
     const rawStocks = currentFormat === 'Super8'
       ? getSuper8Stocks(currentBrand, currentType)
       : (STOCKS_BY_TYPE[currentType]?.[currentBrand] ?? FILM_STOCKS[currentBrand] ?? []);
@@ -382,19 +389,27 @@ const Films = (() => {
     return `
       <div class="form-row-3">
         <div class="form-group">
-          <label>Estado rollo</label>
+          <label>${I18n.t('form_roll_condition')}</label>
           <select id="f-film-status">
-            ${sel([['fresh','Fresh'],['cadufresh','CaduFresh'],['rancio','Rancio']], v('film_status','fresh'))}
+            ${sel([
+              ['fresh', I18n.t('cond_fresh')],
+              ['cadufresh', I18n.t('cond_cadufresh')],
+              ['rancio', I18n.t('cond_rancio')]
+            ], v('film_status','fresh'))}
           </select>
         </div>
         <div class="form-group">
-          <label>Tipo</label>
+          <label>${I18n.t('form_type')}</label>
           <select id="f-type" onchange="Films.onTypeChange()">
-            ${sel([['color','Color'],['bw','B&N'],['slide','Diapositiva']], v('type','color'))}
+            ${sel([
+              ['color', I18n.t('type_color')],
+              ['bw', I18n.t('type_bw')],
+              ['slide', I18n.t('form_slide_type')]
+            ], v('type','color'))}
           </select>
         </div>
         <div class="form-group">
-          <label>Formato</label>
+          <label>${I18n.t('form_format')}</label>
           <select id="f-format" onchange="Films.onFormatChange()">
             ${sel([['35mm','35mm'],['120','120'],['Super8','Super 8']], currentFormat)}
           </select>
@@ -402,26 +417,26 @@ const Films = (() => {
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>Marca</label>
+          <label>${I18n.t('form_brand')}</label>
           <select id="f-brand" onchange="Films.onBrandChange()">
             ${brandList.map(b => `<option value="${b}" ${currentBrand === b ? 'selected' : ''}>${b}</option>`).join('')}
           </select>
         </div>
         <div class="form-group">
-          <label>Nombre / Emulsión</label>
+          <label>${I18n.t('form_emulsion')}</label>
           <select id="f-name" onchange="Films.onNameChange()">
-            <option value="">— Seleccionar —</option>
+            <option value="">${I18n.t('form_select')}</option>
             ${rawStocks.map(s => `<option value="${s}" ${selectValue === s ? 'selected' : ''}>${s}</option>`).join('')}
-            <option value="__otro__" ${selectValue === '__otro__' ? 'selected' : ''}>Otro (escribir)</option>
+            <option value="__otro__" ${selectValue === '__otro__' ? 'selected' : ''}>${I18n.t('form_other_write')}</option>
           </select>
           <div id="f-name-custom-wrap" class="${nameIsCustom ? '' : 'hidden'}" style="margin-top:.4rem">
-            <input id="f-name-custom" value="${nameIsCustom ? currentName : ''}" placeholder="Escribe la emulsión…">
+            <input id="f-name-custom" value="${nameIsCustom ? currentName : ''}" placeholder="${I18n.t('form_emulsion_placeholder')}">
           </div>
         </div>
       </div>
       <input id="f-iso" type="hidden" value="${v('iso')}">
       <div class="form-group">
-        <label>Nº fotos</label>
+        <label>${I18n.t('form_num_photos')}</label>
         <select id="f-num-photos">
           <option value="">—</option>
           ${currentFormat === 'Super8'
@@ -433,89 +448,100 @@ const Films = (() => {
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>Cámara</label>
+          <label>${I18n.t('form_camera')}</label>
           <select id="f-camera" onchange="Films.onCameraChange()">
-            <option value="">— Sin cámara —</option>
+            <option value="">${I18n.t('form_no_camera')}</option>
             ${isNew && cameras.length === 0
-              ? `<option value="__import_cameras__">📷 ¿Quieres importar las cámaras de nuestro brevísimo catálogo?</option>`
+              ? `<option value="__import_cameras__">${I18n.t('form_import_cameras')}</option>`
               : cameras.map(c => `<option value="${c.id}" ${defCameraId === c.id ? 'selected' : ''}>${c.brand} ${c.model}</option>`).join('')
             }
-            <option value="__add_camera__">📸 ¿Tu cámara es única y diferente? Añádela aquí</option>
+            <option value="__add_camera__">${I18n.t('form_add_camera_unique')}</option>
           </select>
           <div id="f-camera-custom-wrap" class="hidden" style="margin-top:.5rem;display:flex;gap:.5rem">
-            <input id="f-camera-brand" placeholder="Marca (ej. Olympus)" style="flex:1">
-            <input id="f-camera-model" placeholder="Modelo (ej. OM-1)" style="flex:1">
+            <input id="f-camera-brand" placeholder="${I18n.t('form_camera_brand_ph')}" style="flex:1">
+            <input id="f-camera-model" placeholder="${I18n.t('form_camera_model_ph')}" style="flex:1">
           </div>
         </div>
         <div class="form-group">
-          <label>Lente</label>
+          <label>${I18n.t('form_lens')}</label>
           <select id="f-lens">
-            <option value="">— Sin lente —</option>
+            <option value="">${I18n.t('form_no_lens')}</option>
             ${lenses.map(l => `<option value="${l.id}" ${defLensId === l.id ? 'selected' : ''}>${l.brand} ${l.focal_length}</option>`).join('')}
           </select>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>Estado actual</label>
+          <label>${I18n.t('form_status')}</label>
           <select id="f-status">
             ${sel([
-              ['en_camara','En cámara'],['en_revelado','Por revelar'],
-              ['finalizado','Finalizado'],['escaneado','Por escanear']
+              ['en_camara',   I18n.t('status_en_camara')],
+              ['en_revelado', I18n.t('status_en_revelado')],
+              ['finalizado',  I18n.t('status_finalizado')],
+              ['escaneado',   I18n.t('status_escaneado')]
             ], v('current_status','en_camara'))}
           </select>
         </div>
         <div class="form-group">
-          <label>Forzado</label>
+          <label>${I18n.t('form_push_pull')}</label>
           <select id="f-push-pull">
-            ${sel([['no','No'],['+1','+1 paso'],['+2','+2 pasos'],['+3','+3 pasos'],['-1','-1 paso'],['-2','-2 pasos']], v('push_pull','no'))}
+            ${sel([
+              ['no',  I18n.t('form_push_no')],
+              ['+1',  I18n.t('form_push_1')],
+              ['+2',  I18n.t('form_push_2')],
+              ['+3',  I18n.t('form_push_3')],
+              ['-1',  I18n.t('form_pull_1')],
+              ['-2',  I18n.t('form_pull_2')]
+            ], v('push_pull','no'))}
           </select>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>Fecha inicio</label>
+          <label>${I18n.t('form_start_date')}</label>
           <input id="f-start" type="date" value="${defStart}">
         </div>
         <div class="form-group">
-          <label>Fecha fin</label>
+          <label>${I18n.t('form_end_date')}</label>
           <input id="f-end" type="date" value="${defEnd}">
         </div>
       </div>
       <div class="form-group">
-        <label>Lab de revelado</label>
+        <label>${I18n.t('form_lab')}</label>
         <select id="f-lab">
-          <option value="">— Sin lab —</option>
+          <option value="">${I18n.t('form_no_lab')}</option>
           ${LABS.map(l => `<option value="${l}" ${v('lab') === l ? 'selected' : ''}>${l}</option>`).join('')}
         </select>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>Ciudad</label>
-          <input id="f-city" value="${defCity}" placeholder="Ciudad">
+          <label>${I18n.t('form_city')}</label>
+          <input id="f-city" value="${defCity}" placeholder="${I18n.t('form_city_ph')}">
         </div>
         <div class="form-group">
-          <label>País</label>
-          <input id="f-country" value="${defCountry}" placeholder="País">
+          <label>${I18n.t('form_country')}</label>
+          <input id="f-country" value="${defCountry}" placeholder="${I18n.t('form_country_ph')}">
         </div>
       </div>
       <div class="form-group">
-        <label>Tipo de foto</label>
+        <label>${I18n.t('form_photo_type')}</label>
         <select id="f-photo-type">
-          <option value="">— Sin clasificar —</option>
-          ${sel([
-            ['familia','Familia'],['amigos','Amigos'],
-            ['paisaje','Paisaje'],['retrato','Retrato'],['macro','Macro'],
-            ['boda','Boda'],['eventos','Eventos'],['mascotas','Mascotas'],
-            ['estudio','Estudio'],['producto','De producto'],
-            ['chile_mole','De chile, mole y pozole'],['ex','de mi ex :('],
-            ['otro','Otro']
-          ], v('photo_type'))}
+          <option value="">${I18n.t('form_photo_type_none')}</option>
+          ${[
+            ['familia','photo_familia'],['amigos','photo_amigos'],
+            ['paisaje','photo_paisaje'],['retrato','photo_retrato'],['macro','photo_macro'],
+            ['boda','photo_boda'],['eventos','photo_eventos'],['mascotas','photo_mascotas'],
+            ['estudio','photo_estudio'],['producto','photo_producto'],
+            ['chile_mole','photo_chile_mole'],['ex','photo_ex'],
+            ['otro','photo_otro']
+          ].map(([val, key]) =>
+            `<option value="${val}" ${v('photo_type') === val ? 'selected' : ''}>${I18n.t(key)}</option>`
+          ).join('')}
         </select>
       </div>
       <div class="form-group">
-        <label>Notas</label>
-        <textarea id="f-notes" placeholder="Notas libres…">${v('notes')}</textarea>
+        <label>${I18n.t('form_notes')}</label>
+        <textarea id="f-notes" placeholder="${I18n.t('form_notes_ph')}">${v('notes')}</textarea>
       </div>`;
   }
 
@@ -557,13 +583,13 @@ const Films = (() => {
     const film = films.find(f => f.id === id);
     if (!film) return;
     Modal.open({
-      title: 'Eliminar rollo',
-      body: `<p>¿Estás seguro que quieres eliminar tu rollo :O ?<br><strong>${film.name} — ${film.brand}</strong></p>`,
-      saveLabel: 'Eliminar',
+      title: I18n.t('delete_roll_title'),
+      body: `<p>${I18n.t('delete_roll_q')}<br><strong>${film.name} — ${film.brand}</strong></p>`,
+      saveLabel: I18n.t('modal_delete'),
       saveDanger: true,
       onSave: async () => {
         await remove(id);
-        Toast.show('Rollo eliminado', 'success');
+        Toast.show(I18n.t('toast_roll_deleted'), 'success');
         await render();
         await Dashboard.render();
         if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
@@ -582,12 +608,12 @@ const Films = (() => {
     const updatedCameras = Cameras.getAll();
     const updatedLenses  = Lenses.getAll();
     const camSel = document.getElementById('f-camera');
-    camSel.innerHTML = `<option value="">— Sin cámara —</option>` +
+    camSel.innerHTML = `<option value="">${I18n.t('form_no_camera')}</option>` +
       updatedCameras.map(c => `<option value="${c.id}">${c.brand} ${c.model}</option>`).join('');
     const defCam = updatedCameras.find(c => /nikon/i.test(c.brand) && /f3/i.test(c.model));
     if (defCam) camSel.value = defCam.id;
     const lensSel = document.getElementById('f-lens');
-    lensSel.innerHTML = `<option value="">— Sin lente —</option>` +
+    lensSel.innerHTML = `<option value="">${I18n.t('form_no_lens')}</option>` +
       updatedLenses.map(l => `<option value="${l.id}">${l.brand} ${l.focal_length}</option>`).join('');
     const defLens = updatedLenses.find(l => /nikkor/i.test(l.brand) && /^50mm f\/1\.4/.test(l.focal_length))
                  || updatedLenses.find(l => /nikkor/i.test(l.brand) && /50/.test(l.focal_length));
@@ -640,7 +666,6 @@ const Films = (() => {
   async function render() {
     await load();
 
-    // Apply filters
     const fStatus  = document.getElementById('filter-status')?.value || '';
     const fType    = document.getElementById('filter-type')?.value   || '';
     const fFormat  = document.getElementById('filter-format')?.value || '';
@@ -654,7 +679,6 @@ const Films = (() => {
       `${f.brand} ${f.name} ${f.city} ${f.country}`.toLowerCase().includes(fSearch)
     );
 
-    // Apply sort
     const sortFn = _SORT_FN[_sortCol];
     if (sortFn) {
       list = [...list].sort((a, b) => _sortDir === 'asc' ? sortFn(a, b) : sortFn(b, a));
@@ -667,7 +691,7 @@ const Films = (() => {
       wrapper.innerHTML = `
         <div class="empty-state">
           <div class="empty-icon">🎞</div>
-          <p>${films.length ? 'No hay rollos con esos filtros.' : 'No tienes rollos registrados aún.'}</p>
+          <p>${films.length ? I18n.t('empty_filters') : I18n.t('empty_rolls')}</p>
         </div>`;
       return;
     }
@@ -676,16 +700,16 @@ const Films = (() => {
     wrapper.innerHTML = `
       <table>
         <thead><tr>
-          ${_th('created_at','Agregado el: ')}
-          ${_th('name','Rollo')}
-          ${_th('tipo','Tipo')}
-          ${_th('iso','ISO')}
-          ${_th('formato','Formato')}
-          ${_th('camara','Cámara')}
-          ${_th('estado','Estado')}
-          ${_th('lab','Lab')}
-          ${_th('fin','Finalizado en: ')}
-          ${hasNotes ? '<th>Notas</th>' : ''}
+          ${_th('created_at', I18n.t('th_added'))}
+          ${_th('name',       I18n.t('th_roll'))}
+          ${_th('tipo',       I18n.t('th_type'))}
+          ${_th('iso',        I18n.t('th_iso'))}
+          ${_th('formato',    I18n.t('th_format'))}
+          ${_th('camara',     I18n.t('th_camera'))}
+          ${_th('estado',     I18n.t('th_status'))}
+          ${_th('lab',        I18n.t('th_lab'))}
+          ${_th('fin',        I18n.t('th_finished'))}
+          ${hasNotes ? `<th>${I18n.t('th_notes')}</th>` : ''}
           <th></th>
         </tr></thead>
         <tbody>
@@ -708,7 +732,6 @@ const Films = (() => {
               <td>${statusBadge(f.current_status)}</td>
               <td class="text-sm">${f.lab || '—'}</td>
               <td class="text-sm">${formatDate(f.end_date) || '—'}</td>
-
               ${hasNotes ? `<td class="text-sm">${f.notes || ''}</td>` : ''}
               <td>
                 <div class="actions">
@@ -730,9 +753,9 @@ const Films = (() => {
     const cameras = Cameras.getAll();
 
     Modal.open({
-      title: 'Añadir rollo',
+      title: I18n.t('quick_title'),
       wide: false,
-      saveLabel: 'Crear rollo',
+      saveLabel: I18n.t('quick_save'),
       body: quickFormHtml(cameras),
       onSave: async () => {
         try {
@@ -741,17 +764,16 @@ const Films = (() => {
           const rawName = document.getElementById('q-name')?.value;
 
           if (!brand || !rawName) {
-            Toast.show('Selecciona una emulsión', 'error');
+            Toast.show(I18n.t('quick_select_emulsion'), 'error');
             return false;
           }
 
-          // Inline camera creation
           let cameraId = document.getElementById('q-camera')?.value || null;
           if (cameraId === '__add_camera__') {
             const camBrand = document.getElementById('q-camera-brand')?.value.trim();
             const camModel = document.getElementById('q-camera-model')?.value.trim();
             if (!camBrand || !camModel) {
-              Toast.show('Escribe la marca y modelo de tu cámara', 'error');
+              Toast.show(I18n.t('toast_fill_camera'), 'error');
               return false;
             }
             await Cameras.save({ brand: camBrand, model: camModel, format, type: 'SLR' });
@@ -762,16 +784,13 @@ const Films = (() => {
             cameraId = null;
           }
 
-          // Generic 28mm lens (fallback: null if user hasn't imported lenses)
           const genericLens = Lenses.getAll().find(l =>
             /gen[eé]rico/i.test(l.brand) && /28mm/i.test(l.focal_length)
           );
 
-          // Defaults
           const numPhotos = format === '120' ? '12' : format === 'Super8' ? '18' : '36';
           const today = new Date().toISOString().split('T')[0];
 
-          // ISO resolution (reuse same logic as advanced mode)
           let iso = 0;
           if (ISO_LOOKUP[rawName] !== undefined) {
             iso = ISO_LOOKUP[rawName];
@@ -803,13 +822,13 @@ const Films = (() => {
 
           await save(form);
           lastRoll = form;
-          Toast.show('Rollo añadido', 'success');
+          Toast.show(I18n.t('toast_roll_added'), 'success');
           await render();
           await Dashboard.render();
           if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
           return true;
         } catch (err) {
-          Toast.show(err.message || 'Error al guardar', 'error');
+          Toast.show(err.message || I18n.t('toast_save_error'), 'error');
           return false;
         }
       }
@@ -834,12 +853,12 @@ const Films = (() => {
 
     const modeHeader = !isEdit ? `
       <div class="quick-mode-header">
-        <span class="quick-mode-badge">&#9881; Modo avanzado</span>
-        <button type="button" class="btn-link-subtle" onclick="Films.switchToQuick()">&larr; Modo r&aacute;pido</button>
+        <span class="quick-mode-badge">&#9881; ${I18n.t('adv_mode_label')}</span>
+        <button type="button" class="btn-link-subtle" onclick="Films.switchToQuick()">${I18n.t('adv_quick_btn')}</button>
       </div>` : '';
 
     Modal.open({
-      title: isEdit ? 'Editar rollo' : 'Nuevo rollo',
+      title: isEdit ? I18n.t('adv_title_edit') : I18n.t('adv_title_new'),
       wide: true,
       body: modeHeader + formHtml(defaults, cameras, lenses),
       onSave: async () => {
@@ -848,7 +867,7 @@ const Films = (() => {
           if (camVal === '__add_camera__') {
             const camBrand = document.getElementById('f-camera-brand')?.value.trim();
             const camModel = document.getElementById('f-camera-model')?.value.trim();
-            if (!camBrand || !camModel) { Toast.show('Escribe la marca y modelo de tu cámara', 'error'); return false; }
+            if (!camBrand || !camModel) { Toast.show(I18n.t('toast_fill_camera'), 'error'); return false; }
             const format = document.getElementById('f-format')?.value || '35mm';
             await Cameras.save({ brand: camBrand, model: camModel, format, type: 'SLR' });
             await Cameras.load();
@@ -865,17 +884,17 @@ const Films = (() => {
           const form = collectForm(film);
           const needsIso = form.format !== 'Super8';
           if (!form.brand || !form.name || (needsIso && !form.iso)) {
-            Toast.show('Marca y nombre son obligatorios', 'error'); return false;
+            Toast.show(I18n.t('toast_required'), 'error'); return false;
           }
           await save(form);
           if (!isEdit) lastRoll = form;
-          Toast.show(isEdit ? 'Rollo actualizado' : 'Rollo añadido', 'success');
+          Toast.show(isEdit ? I18n.t('toast_roll_updated') : I18n.t('toast_roll_added'), 'success');
           await render();
           await Dashboard.render();
           if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
           return true;
         } catch (err) {
-          Toast.show(err.message || 'Error al guardar el rollo', 'error');
+          Toast.show(err.message || I18n.t('toast_save_roll_error'), 'error');
           return false;
         }
       }
@@ -889,11 +908,11 @@ const Films = (() => {
     const initialStocks = FILM_STOCKS['Kodak'] || [];
     return `
       <div class="quick-mode-header">
-        <span class="quick-mode-badge">&#9889; Modo rápido</span>
-        <button type="button" class="btn-link-subtle" onclick="Films.switchToAdvanced()">Modo avanzado &rarr;</button>
+        <span class="quick-mode-badge">&#9889; ${I18n.t('quick_mode_label')}</span>
+        <button type="button" class="btn-link-subtle" onclick="Films.switchToAdvanced()">${I18n.t('quick_advanced_btn')}</button>
       </div>
       <div class="form-group">
-        <label>Formato</label>
+        <label>${I18n.t('form_format')}</label>
         <select id="q-format" onchange="Films.onQuickFormatChange()">
           <option value="35mm">35mm</option>
           <option value="120">120</option>
@@ -902,35 +921,35 @@ const Films = (() => {
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>Marca</label>
+          <label>${I18n.t('form_brand')}</label>
           <select id="q-brand" onchange="Films.onQuickBrandChange()">
             ${QUICK_BRANDS.map(b => `<option value="${b}">${b}</option>`).join('')}
           </select>
         </div>
         <div class="form-group">
-          <label>Emulsión</label>
+          <label>${I18n.t('quick_emulsion')}</label>
           <select id="q-name" onchange="Films.onQuickNameChange()">
-            <option value="">— Seleccionar —</option>
+            <option value="">${I18n.t('quick_select')}</option>
             ${initialStocks.map(s => `<option value="${s}">${s}</option>`).join('')}
           </select>
         </div>
       </div>
       <div id="q-chip-preview" style="display:flex;justify-content:center;margin:.5rem 0 .75rem;min-height:58px"></div>
       <div class="form-group">
-        <label>Cámara <span class="label-optional">(opcional)</span></label>
+        <label>${I18n.t('quick_camera_optional')} <span class="label-optional">${I18n.t('quick_camera_opt_label')}</span></label>
         <select id="q-camera" onchange="Films.onQuickCameraChange()">
-          <option value="">— Sin cámara —</option>
+          <option value="">${I18n.t('quick_no_camera')}</option>
           ${cameras.map(c => `<option value="${c.id}">${c.brand} ${c.model}</option>`).join('')}
-          <option value="__add_camera__">&#128248; ¿Tu cámara es única? Añádela aquí</option>
+          <option value="__add_camera__">${I18n.t('quick_add_camera')}</option>
         </select>
         <div id="q-camera-custom-wrap" class="hidden" style="margin-top:.5rem;display:flex;gap:.5rem">
-          <input id="q-camera-brand" placeholder="Marca (ej. Olympus)" style="flex:1">
-          <input id="q-camera-model" placeholder="Modelo (ej. OM-1)" style="flex:1">
+          <input id="q-camera-brand" placeholder="${I18n.t('form_camera_brand_ph')}" style="flex:1">
+          <input id="q-camera-model" placeholder="${I18n.t('form_camera_model_ph')}" style="flex:1">
         </div>
       </div>
       <div class="form-group">
-        <label>Notas <span class="label-optional">(opcional)</span></label>
-        <textarea id="q-notes" placeholder="Notas libres…" rows="2"></textarea>
+        <label>${I18n.t('quick_notes_optional')} <span class="label-optional">${I18n.t('quick_camera_opt_label')}</span></label>
+        <textarea id="q-notes" placeholder="${I18n.t('form_notes_ph')}" rows="2"></textarea>
       </div>`;
   }
 
@@ -956,7 +975,7 @@ const Films = (() => {
     if (!nameSel || !brand) return;
     const stocks = getQuickStocks(brand, format);
     nameSel.innerHTML =
-      `<option value="">— Seleccionar —</option>` +
+      `<option value="">${I18n.t('quick_select')}</option>` +
       stocks.map(s => `<option value="${s}">${s}</option>`).join('');
     if (stocks.length) nameSel.value = stocks[0];
     _updateQuickChip();
@@ -1004,6 +1023,7 @@ const Films = (() => {
     onQuickFormatChange, onQuickBrandChange, onQuickNameChange, onQuickCameraChange,
     switchToAdvanced, switchToQuick,
     remove, confirmDelete, toggleSort,
-    STATUS_CONFIG, FILM_STATUS_CFG, statusBadge, filmStatusBadge, typeBadge, formatDate
+    statusBadge, filmStatusBadge, typeBadge, formatDate, photoTypeLabel,
+    STATUS_CONFIG: statusConfig,
   };
 })();

@@ -21,12 +21,12 @@ const Toast = (() => {
 const Modal = (() => {
   let onSaveCallback = null;
 
-  function open({ title, body, onSave, saveLabel = 'Guardar', saveDanger = false, wide = false }) {
+  function open({ title, body, onSave, saveLabel = null, saveDanger = false, wide = false }) {
     onSaveCallback = onSave;
     document.getElementById('modal-title').textContent = title;
     document.getElementById('modal-body').innerHTML = body;
     const saveBtn = document.getElementById('modal-save');
-    saveBtn.textContent = saveLabel;
+    saveBtn.textContent = saveLabel ?? I18n.t('modal_save');
     saveBtn.className = `btn ${saveDanger ? 'btn-danger' : 'btn-primary'}`;
     const modal = document.querySelector('.modal');
     modal.style.maxWidth = wide ? '680px' : '580px';
@@ -76,14 +76,15 @@ const App = (() => {
     document.querySelectorAll('.nav-link, .bottom-nav-item[data-view]').forEach(link => {
       link.classList.toggle('active', link.dataset.view === navView);
     });
-    document.getElementById('page-title').textContent = {
-      dashboard:     'Panel de control',
-      gear:          'Gear',
-      films:         'Rollos',
-      'film-detail': 'Detalle del rollo',
-      timeline:      'Línea de tiempo',
-      stats:         'Estadísticas',
-    }[view] || view;
+    const titles = {
+      dashboard:     I18n.t('page_dashboard'),
+      gear:          I18n.t('page_gear'),
+      films:         I18n.t('page_rolls'),
+      'film-detail': I18n.t('page_film_detail'),
+      timeline:      I18n.t('page_timeline'),
+      stats:         I18n.t('page_stats'),
+    };
+    document.getElementById('page-title').textContent = titles[view] || view;
 
     // Close mobile sidebar
     document.getElementById('sidebar').classList.remove('open');
@@ -148,7 +149,7 @@ const App = (() => {
 const Theme = (() => {
   function apply(dark) {
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-    document.getElementById('theme-label').textContent = dark ? 'Modo claro' : 'Modo oscuro';
+    document.getElementById('theme-label').textContent = dark ? I18n.t('theme_light') : I18n.t('theme_dark');
     document.getElementById('theme-icon').textContent  = dark ? '☀️' : '🌙';
   }
 
@@ -175,6 +176,14 @@ const Theme = (() => {
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+  I18n.init();
+  I18n.apply();
+  // Sync lang toggle buttons to current language
+  const currentLang = I18n.getLang();
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.textContent = currentLang === 'es' ? 'EN' : 'ES';
+  });
+
   Theme.init();
   Theme.bindUI();
   Modal.bindUI();

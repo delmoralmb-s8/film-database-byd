@@ -114,12 +114,12 @@ const Cameras = (() => {
     const missing = DEFAULT_CAMERAS.filter(d =>
       !cameras.some(c => c.brand === d.brand && c.model === d.model)
     );
-    if (!missing.length) { Toast.show('Todas las cámaras predeterminadas ya están añadidas', 'success'); return; }
+    if (!missing.length) { Toast.show(I18n.t('toast_cameras_all_added'), 'success'); return; }
     const rows = missing.map(c => ({ ...c, user_id: user.id }));
     const { data, error } = await supabase.from('cameras').insert(rows).select();
     if (error) { Toast.show(error.message, 'error'); return; }
     cameras = [...cameras, ...data];
-    Toast.show(`${data.length} cámaras importadas`, 'success');
+    Toast.show(I18n.t('toast_cameras_imported', { n: data.length }), 'success');
     await render();
   }
 
@@ -131,7 +131,7 @@ const Cameras = (() => {
     const modelSel = document.getElementById('cam-model-select');
     modelSel.innerHTML = models.map(c =>
       `<option value="${c.model}" data-format="${c.format}" data-type="${c.type}">${c.model}</option>`
-    ).join('') + `<option value="__otro__">Otro…</option>`;
+    ).join('') + `<option value="__otro__">${I18n.t('cam_form_other_model')}</option>`;
     onModelChange();
   }
 
@@ -194,7 +194,7 @@ const Cameras = (() => {
       container.querySelector('.table-wrapper').innerHTML = `
         <div class="empty-state">
           <div class="empty-icon">📷</div>
-          <p>No tienes cámaras registradas aún.</p>
+          <p>${I18n.t('empty_cameras')}</p>
         </div>`;
       return;
     }
@@ -202,7 +202,11 @@ const Cameras = (() => {
     container.querySelector('.table-wrapper').innerHTML = `
       <table>
         <thead><tr>
-          <th>Marca</th><th>Modelo</th><th>Formato</th><th>Tipo</th><th></th>
+          <th>${I18n.t('cam_th_brand')}</th>
+          <th>${I18n.t('cam_th_model')}</th>
+          <th>${I18n.t('cam_th_format')}</th>
+          <th>${I18n.t('cam_th_type')}</th>
+          <th></th>
         </tr></thead>
         <tbody>
           ${cameras.map(c => `
@@ -232,34 +236,34 @@ const Cameras = (() => {
     const initialModels = CAMERA_MODELS[currentBrand] || [];
 
     Modal.open({
-      title: isEdit ? 'Editar cámara' : 'Nueva cámara',
+      title: isEdit ? I18n.t('cam_form_edit_title') : I18n.t('cam_form_new_title'),
       body: `
         <div class="form-group">
-          <label>Marca</label>
+          <label>${I18n.t('cam_form_brand')}</label>
           <select id="cam-brand-select" onchange="Cameras.onBrandChange('', '')">
             ${CAMERA_BRANDS.map(b => `<option value="${b}" ${currentBrand === b ? 'selected' : ''}>${b}</option>`).join('')}
-            <option value="__otro__" ${isCustomBrand ? 'selected' : ''}>Otra…</option>
+            <option value="__otro__" ${isCustomBrand ? 'selected' : ''}>${I18n.t('cam_form_other_brand')}</option>
           </select>
           <div id="cam-brand-custom-wrap" class="${isCustomBrand ? '' : 'hidden'}" style="margin-top:.4rem">
-            <input id="cam-brand-custom" value="${isCustomBrand ? camera.brand : ''}" placeholder="Escribe la marca…">
+            <input id="cam-brand-custom" value="${isCustomBrand ? camera.brand : ''}" placeholder="${I18n.t('cam_form_brand_ph')}">
           </div>
         </div>
         <div class="form-group">
-          <label>Modelo</label>
+          <label>${I18n.t('cam_form_model')}</label>
           <select id="cam-model-select" onchange="Cameras.onModelChange()">
             ${initialModels.map(c =>
               `<option value="${c.model}" data-format="${c.format}" data-type="${c.type}"
                 ${currentModel === c.model ? 'selected' : ''}>${c.model}</option>`
             ).join('')}
-            <option value="__otro__" ${isCustomModel ? 'selected' : ''}>Otro…</option>
+            <option value="__otro__" ${isCustomModel ? 'selected' : ''}>${I18n.t('cam_form_other_model')}</option>
           </select>
           <div id="cam-model-custom-wrap" class="${isCustomModel ? '' : 'hidden'}" style="margin-top:.4rem">
-            <input id="cam-model-custom" value="${isCustomModel ? camera.model : ''}" placeholder="Escribe el modelo…">
+            <input id="cam-model-custom" value="${isCustomModel ? camera.model : ''}" placeholder="${I18n.t('cam_form_model_ph')}">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Formato</label>
+            <label>${I18n.t('cam_form_format')}</label>
             <select id="cam-format">
               <option value="35mm"   ${camera?.format === '35mm'   ? 'selected' : ''}>35mm</option>
               <option value="120"    ${camera?.format === '120'    ? 'selected' : ''}>120</option>
@@ -267,7 +271,7 @@ const Cameras = (() => {
             </select>
           </div>
           <div class="form-group">
-            <label>Tipo</label>
+            <label>${I18n.t('cam_form_type')}</label>
             <select id="cam-type">
               ${['p&s','SLR','TLR','Rangefinder'].map(t =>
                 `<option value="${t}" ${camera?.type === t ? 'selected' : ''}>${t}</option>`
@@ -291,16 +295,15 @@ const Cameras = (() => {
           format: document.getElementById('cam-format').value,
           type:   document.getElementById('cam-type').value,
         };
-        if (!form.brand || !form.model) { Toast.show('Rellena todos los campos', 'error'); return false; }
+        if (!form.brand || !form.model) { Toast.show(I18n.t('toast_fill_fields'), 'error'); return false; }
         await save(form);
-        Toast.show(isEdit ? 'Cámara actualizada' : 'Cámara añadida', 'success');
+        Toast.show(isEdit ? I18n.t('toast_camera_updated') : I18n.t('toast_camera_added'), 'success');
         await render();
         await Films.load();
         if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
         return true;
       }
     });
-    // Auto-fill format/type for initial selection
     setTimeout(() => onModelChange(), 0);
   }
 
@@ -313,13 +316,13 @@ const Cameras = (() => {
     const cam = cameras.find(c => c.id === id);
     if (!cam) return;
     Modal.open({
-      title: 'Eliminar cámara',
-      body: `<p>¿Eliminar <strong>${cam.brand} ${cam.model}</strong>? Los rollos asociados quedarán sin cámara asignada.</p>`,
-      saveLabel: 'Eliminar',
+      title: I18n.t('delete_camera_title'),
+      body: `<p>${I18n.t('delete_camera_q', { name: `${cam.brand} ${cam.model}` })}</p>`,
+      saveLabel: I18n.t('modal_delete'),
       saveDanger: true,
       onSave: async () => {
         await remove(id);
-        Toast.show('Cámara eliminada', 'success');
+        Toast.show(I18n.t('toast_camera_deleted'), 'success');
         await render();
         await Films.load();
         if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();

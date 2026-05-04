@@ -4,11 +4,6 @@
 
 const Timeline = (() => {
 
-  const MONTHS_ES = [
-    'Enero','Febrero','Marzo','Abril','Mayo','Junio',
-    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
-  ];
-
   const FORMATS = [
     { key: '35mm',   label: '35mm',    icon: '&#127902;' },
     { key: '120',    label: '120',     icon: '&#128247;' },
@@ -30,8 +25,6 @@ const Timeline = (() => {
     return '';
   }
 
-  // ── Collapse toggle ──────────────────────────────────────────
-  // Al abrir un año → abre también todos sus meses
   function toggleSection(btn) {
     const body   = btn.nextElementSibling;
     const isOpen = btn.classList.contains('open');
@@ -41,7 +34,6 @@ const Timeline = (() => {
     body.style.display = isOpen ? 'none' : '';
 
     if (!isOpen && isYear) {
-      // Expandir todos los meses dentro de este año
       body.querySelectorAll('.tl-collapse-btn--month').forEach(mBtn => {
         mBtn.classList.add('open');
         mBtn.nextElementSibling.style.display = '';
@@ -49,7 +41,6 @@ const Timeline = (() => {
     }
   }
 
-  // ── Colapsar / Expandir todo ─────────────────────────────────
   function toggleAll(expand) {
     const panel = document.querySelector('.tl-fmt-panel.active');
     if (!panel) return;
@@ -59,9 +50,8 @@ const Timeline = (() => {
       btn.classList.toggle('open', expand);
       body.style.display = expand ? '' : 'none';
     });
-    // Actualizar texto del botón
     const allBtn = document.getElementById('tl-toggle-all-btn');
-    if (allBtn) allBtn.textContent = expand ? 'Colapsar todo' : 'Expandir todo';
+    if (allBtn) allBtn.textContent = expand ? I18n.t('tl_collapse_all') : I18n.t('tl_expand_all');
     allBtn?.setAttribute('data-expanded', expand ? '1' : '0');
   }
 
@@ -71,7 +61,6 @@ const Timeline = (() => {
     toggleAll(!expanded);
   }
 
-  // ── Format tab switch ────────────────────────────────────────
   function switchFormat(btn) {
     const fmt = btn.dataset.fmt;
     document.querySelectorAll('.tl-fmt-tab').forEach(t =>
@@ -80,7 +69,6 @@ const Timeline = (() => {
       p.classList.toggle('active', p.dataset.fmt === fmt));
   }
 
-  // ── Main render ──────────────────────────────────────────────
   function render() {
     const films    = Films.getAll();
     const container = document.getElementById('timeline-view');
@@ -94,12 +82,11 @@ const Timeline = (() => {
       container.innerHTML = `
         <div class="empty-state">
           <div class="empty-icon">&#128338;</div>
-          <p>Registra rollos con fecha para ver tu línea de tiempo.</p>
+          <p>${I18n.t('empty_timeline')}</p>
         </div>`;
       return;
     }
 
-    // Agrupar: formato → año → mes → rollos
     const grouped = {};
     FORMATS.forEach(f => { grouped[f.key] = {}; });
 
@@ -114,21 +101,21 @@ const Timeline = (() => {
       grouped[fmt][y][m].push(film);
     });
 
-    // Primer formato con rollos
     const firstFmt = FORMATS.find(f =>
       Object.keys(grouped[f.key]).length
     )?.key || '35mm';
 
+    const n = dated.length;
     container.innerHTML = `
       <div class="page-header" style="margin-bottom:1.25rem">
         <div>
-          <h2>Línea de tiempo</h2>
+          <h2>${I18n.t('tl_title')}</h2>
           <p class="text-muted text-sm" style="margin-top:.25rem">
-            ${dated.length} rollo${dated.length !== 1 ? 's' : ''} con fecha registrada
+            ${n} ${n !== 1 ? I18n.t('tl_rolls_date_n') : I18n.t('tl_rolls_date_1')}
           </p>
         </div>
         <button id="tl-toggle-all-btn" class="btn btn-ghost btn-sm"
-          data-expanded="1" onclick="Timeline.onToggleAll()">Colapsar todo</button>
+          data-expanded="1" onclick="Timeline.onToggleAll()">${I18n.t('tl_collapse_all')}</button>
       </div>
 
       <div class="tl-fmt-tabs">
@@ -154,7 +141,6 @@ const Timeline = (() => {
     `;
   }
 
-  // ── Panel de un formato ──────────────────────────────────────
   function renderPanel(yearData) {
     const years = Object.keys(yearData).sort((a, b) => b - a);
 
@@ -162,9 +148,11 @@ const Timeline = (() => {
       return `
         <div class="empty-state" style="padding:2rem 1rem">
           <div class="empty-icon" style="font-size:1.75rem;opacity:.35">&#127902;</div>
-          <p style="font-size:.875rem">Sin rollos de este formato con fecha registrada.</p>
+          <p style="font-size:.875rem">${I18n.t('empty_fmt_timeline')}</p>
         </div>`;
     }
+
+    const monthsLong = I18n.t('months_long');
 
     return `
       <div class="tl-root">
@@ -172,29 +160,29 @@ const Timeline = (() => {
           const monthData = yearData[year];
           const months    = Object.keys(monthData).map(Number).sort((a, b) => b - a);
           const total     = months.reduce((s, m) => s + monthData[m].length, 0);
-          const yearOpen  = yi === 0;   // el año más reciente abre por defecto
+          const yearOpen  = yi === 0;
 
           return `
             <div class="tl-year-block">
               <button class="tl-collapse-btn${yearOpen ? ' open' : ''}"
                 onclick="Timeline.toggleSection(this)">
                 <span class="tl-collapse-year">${year}</span>
-                <span class="tl-collapse-count">${total} rollo${total !== 1 ? 's' : ''}</span>
+                <span class="tl-collapse-count">${total} ${total !== 1 ? I18n.t('stats_roll_n') : I18n.t('stats_roll_1')}</span>
                 <span class="tl-chevron">&#8250;</span>
               </button>
 
               <div class="tl-year-body" style="${yearOpen ? '' : 'display:none'}">
                 ${months.map((month, mi) => {
                   const entries    = monthData[month];
-                  const monthLabel = month ? MONTHS_ES[month - 1] : 'Sin mes';
-                  const monthOpen  = yearOpen && mi === 0;  // solo el mes más reciente abre
+                  const monthLabel = month ? (monthsLong[month - 1] || month) : I18n.t('tl_no_month');
+                  const monthOpen  = yearOpen && mi === 0;
 
                   return `
                     <div class="tl-month-block">
                       <button class="tl-collapse-btn tl-collapse-btn--month${monthOpen ? ' open' : ''}"
                         onclick="Timeline.toggleSection(this)">
                         <span class="tl-collapse-month">${monthLabel}</span>
-                        <span class="tl-collapse-count">${entries.length} rollo${entries.length !== 1 ? 's' : ''}</span>
+                        <span class="tl-collapse-count">${entries.length} ${entries.length !== 1 ? I18n.t('stats_roll_n') : I18n.t('stats_roll_1')}</span>
                         <span class="tl-chevron">&#8250;</span>
                       </button>
 
@@ -211,7 +199,6 @@ const Timeline = (() => {
       </div>`;
   }
 
-  // ── Card de un rollo ─────────────────────────────────────────
   function entryHtml(f) {
     const dotCls = formatDotClass(f.format);
     const cam    = f.cameras ? `${f.cameras.brand} ${f.cameras.model}` : null;

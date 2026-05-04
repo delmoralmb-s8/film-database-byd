@@ -34,7 +34,7 @@ const Dashboard = (() => {
     const el = document.getElementById(containerId);
     if (!el) return;
     if (isEmpty) {
-      el.innerHTML = `<p class="text-muted text-sm">Ninguno.</p>`;
+      el.innerHTML = `<p class="text-muted text-sm">${I18n.t('dash_empty')}</p>`;
       return;
     }
     el.innerHTML = `<div class="film-cards">${list.map(f => filmCard(f)).join('')}</div>`;

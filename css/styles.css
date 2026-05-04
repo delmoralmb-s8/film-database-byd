@@ -109,6 +109,31 @@ a:hover { color: var(--primary-h); }
   margin-top: .25rem;
 }
 
+.auth-lang-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.lang-toggle-btn {
+  font-size: .75rem;
+  font-weight: 600;
+  padding: .3rem .75rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-muted);
+  cursor: pointer;
+  letter-spacing: .5px;
+  transition: var(--transition);
+}
+
+.lang-toggle-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
 .auth-tabs {
   display: flex;
   background: var(--card);

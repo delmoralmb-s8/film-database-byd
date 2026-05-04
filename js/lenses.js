@@ -47,16 +47,15 @@ const Lenses = (() => {
   async function seedDefaults() {
     const user = Auth.getUser();
     if (!user) return;
-    // Only insert defaults that don't already exist (match by brand + focal + aperture)
     const missing = DEFAULT_LENSES.filter(d =>
       !lenses.some(l => l.brand === d.brand && l.focal_length === d.focal_length)
     );
-    if (!missing.length) { Toast.show('Todas las lentes predeterminadas ya están añadidas', 'success'); return; }
+    if (!missing.length) { Toast.show(I18n.t('toast_lenses_all_added'), 'success'); return; }
     const rows = missing.map(l => ({ ...l, user_id: user.id }));
     const { data, error } = await supabase.from('lenses').insert(rows).select();
     if (error) { Toast.show(error.message, 'error'); return; }
     lenses = [...lenses, ...data];
-    Toast.show(`${data.length} lentes importadas`, 'success');
+    Toast.show(I18n.t('toast_lenses_imported', { n: data.length }), 'success');
     await render();
   }
 
@@ -94,7 +93,7 @@ const Lenses = (() => {
       wrapper.innerHTML = `
         <div class="empty-state">
           <div class="empty-icon">🔭</div>
-          <p>No tienes lentes registradas aún.</p>
+          <p>${I18n.t('empty_lenses')}</p>
         </div>`;
       return;
     }
@@ -102,7 +101,9 @@ const Lenses = (() => {
     wrapper.innerHTML = `
       <table>
         <thead><tr>
-          <th>Marca</th><th>Lente</th><th></th>
+          <th>${I18n.t('lens_th_brand')}</th>
+          <th>${I18n.t('lens_th_lens')}</th>
+          <th></th>
         </tr></thead>
         <tbody>
           ${lenses.map(l => `
@@ -124,20 +125,20 @@ const Lenses = (() => {
   function openModal(lens = null) {
     const isEdit = !!lens;
     Modal.open({
-      title: isEdit ? 'Editar lente' : 'Nueva lente',
+      title: isEdit ? I18n.t('lens_form_edit_title') : I18n.t('lens_form_new_title'),
       body: `
         <div class="form-group">
-          <label>Marca</label>
-          <input id="lens-brand" value="${lens?.brand ?? ''}" placeholder="Ej. Canon, Nikkor, Leica…" required>
+          <label>${I18n.t('lens_th_brand')}</label>
+          <input id="lens-brand" value="${lens?.brand ?? ''}" placeholder="${I18n.t('lens_form_brand_ph')}" required>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Distancia focal (mm)</label>
-            <input id="lens-focal" value="${lens?.focal_length ?? ''}" placeholder="Ej. 50, 28-70…">
+            <label>${I18n.t('lens_form_focal')}</label>
+            <input id="lens-focal" value="${lens?.focal_length ?? ''}" placeholder="${I18n.t('lens_form_focal_ph')}">
           </div>
           <div class="form-group">
-            <label>Apertura máxima</label>
-            <input id="lens-aperture" value="${lens?.max_aperture ?? ''}" placeholder="Ej. 1.8, 2.8…">
+            <label>${I18n.t('lens_form_aperture')}</label>
+            <input id="lens-aperture" value="${lens?.max_aperture ?? ''}" placeholder="${I18n.t('lens_form_aperture_ph')}">
           </div>
         </div>`,
       onSave: async () => {
@@ -148,10 +149,10 @@ const Lenses = (() => {
           max_aperture: document.getElementById('lens-aperture').value.trim(),
         };
         if (!form.brand || !form.focal_length || !form.max_aperture) {
-          Toast.show('Rellena todos los campos', 'error'); return false;
+          Toast.show(I18n.t('toast_fill_fields'), 'error'); return false;
         }
         await save(form);
-        Toast.show(isEdit ? 'Lente actualizada' : 'Lente añadida', 'success');
+        Toast.show(isEdit ? I18n.t('toast_lens_updated') : I18n.t('toast_lens_added'), 'success');
         await render();
         await Films.load();
         if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
@@ -169,13 +170,13 @@ const Lenses = (() => {
     const lens = lenses.find(l => l.id === id);
     if (!lens) return;
     Modal.open({
-      title: 'Eliminar lente',
-      body: `<p>¿Eliminar <strong>${lens.brand} ${lens.focal_length}</strong>? Los rollos asociados quedarán sin lente asignada.</p>`,
-      saveLabel: 'Eliminar',
+      title: I18n.t('delete_lens_title'),
+      body: `<p>${I18n.t('delete_lens_q', { name: `${lens.brand} ${lens.focal_length}` })}</p>`,
+      saveLabel: I18n.t('modal_delete'),
       saveDanger: true,
       onSave: async () => {
         await remove(id);
-        Toast.show('Lente eliminada', 'success');
+        Toast.show(I18n.t('toast_lens_deleted'), 'success');
         await render();
         await Films.load();
         if (document.getElementById('stats-view')?.classList.contains('active')) Stats.render();
