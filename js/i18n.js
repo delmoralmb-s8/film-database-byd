@@ -118,6 +118,8 @@ const I18n = (() => {
       cond_fresh: 'Fresh',
       cond_cadufresh: 'CaduFresh',
       cond_rancio: 'Rancio',
+      tl_no_year: 'Sin año',
+      aria_menu: 'Menú',
 
       // Film form
       form_roll_condition: 'Estado rollo',
@@ -448,8 +450,10 @@ const I18n = (() => {
 
       // Film condition labels
       cond_fresh: 'Fresh',
-      cond_cadufresh: 'CaduFresh',
+      cond_cadufresh: 'Aging',
       cond_rancio: 'Expired',
+      tl_no_year: 'No year',
+      aria_menu: 'Menu',
 
       // Film form
       form_roll_condition: 'Roll condition',
@@ -692,6 +696,7 @@ const I18n = (() => {
     document.documentElement.lang = lang;
     apply();
     _updateLangBtns();
+    if (typeof Theme !== 'undefined') Theme.refresh();
     // Re-render active view so all JS-generated text updates
     const activeEl = document.querySelector('.view.active');
     if (activeEl && typeof App !== 'undefined') {

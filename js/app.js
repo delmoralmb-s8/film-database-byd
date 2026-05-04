@@ -168,7 +168,12 @@ const Theme = (() => {
     document.getElementById('btn-theme').addEventListener('click', toggle);
   }
 
-  return { init, bindUI };
+  function refresh() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    apply(isDark);
+  }
+
+  return { init, bindUI, refresh };
 })();
 
 // ============================================================

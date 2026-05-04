@@ -140,11 +140,13 @@ const Films = (() => {
     };
   }
 
-  const FILM_STATUS_CFG = {
-    fresh:     { label: 'Fresh',     cls: 'badge-green'  },
-    cadufresh: { label: 'CaduFresh', cls: 'badge-yellow' },
-    rancio:    { cls: 'badge-red' },
-  };
+  function filmStatusConfig() {
+    return {
+      fresh:     { label: I18n.t('cond_fresh'),     cls: 'badge-green'  },
+      cadufresh: { label: I18n.t('cond_cadufresh'), cls: 'badge-yellow' },
+      rancio:    { label: I18n.t('cond_rancio'),    cls: 'badge-red'    },
+    };
+  }
 
   function typeCfg() {
     return {
@@ -211,9 +213,9 @@ const Films = (() => {
   }
 
   function filmStatusBadge(s) {
-    const c = FILM_STATUS_CFG[s] || { label: s, cls: 'badge-gray' };
-    const label = s === 'rancio' ? I18n.t('cond_rancio') : (c.label || s);
-    return `<span class="badge ${c.cls}">${label}</span>`;
+    const cfg = filmStatusConfig();
+    const c = cfg[s] || { label: s, cls: 'badge-gray' };
+    return `<span class="badge ${c.cls}">${c.label}</span>`;
   }
 
   function typeBadge(t) {

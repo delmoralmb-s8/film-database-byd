@@ -94,7 +94,7 @@ const Timeline = (() => {
       const fmt = film.format || '35mm';
       if (!grouped[fmt]) grouped[fmt] = {};
       const { year, month } = parseYM(dateOf(film));
-      const y = year  || 'Sin año';
+      const y = year  || I18n.t('tl_no_year');
       const m = month || 0;
       if (!grouped[fmt][y])    grouped[fmt][y] = {};
       if (!grouped[fmt][y][m]) grouped[fmt][y][m] = [];
