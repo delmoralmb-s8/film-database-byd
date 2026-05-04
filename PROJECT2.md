@@ -204,3 +204,26 @@ const months = I18n.t('months_short'); // ['Ene','Feb',...] o ['Jan','Feb',...]
 - **Transiciones**: `cubic-bezier(0.4, 0, 0.2, 1)` en todo
 - **Headings**: `letter-spacing: -0.025em`
 - **Botones**: `scale(0.97)` en `:active`, focus ring verde
+
+---
+
+### Auditoría i18n + fixes (commit 537c811)
+
+Pasada de revisión sobre el sistema bilingüe. 232 invocaciones `I18n.t()`, 274 claves ES = 274 EN (sin asimetría ni claves no definidas). Bugs detectados y corregidos:
+
+#### Bugs corregidos
+- **Botón de tema se rompía al cambiar idioma**: el `<span id="theme-label">` tenía `data-i18n="theme_dark"` y `I18n.apply()` reescribía el label dinámico que `Theme.apply()` venía gestionando según el modo activo. Tras cambiar idioma en dark mode, el botón mostraba "Modo oscuro" en vez de "Modo claro" hasta el siguiente click.
+  - **Fix**: quitado `data-i18n` del span; añadido `Theme.refresh()` que lee `data-theme` y reaplica el label. `I18n.setLang()` lo invoca después de `apply()`.
+- **`FILM_STATUS_CFG`** (films.js:143) tenía labels hardcoded `'Fresh' / 'CaduFresh'`; sólo `rancio` se traducía vía caso especial. Convertido a función `filmStatusConfig()` (mismo patrón que `statusConfig()` / `typeCfg()`); badges fresh/cadufresh/rancio ahora se traducen normalmente.
+- **`'Sin año'` hardcoded** en timeline.js:97 → nueva clave `tl_no_year`.
+- **`aria-label="Menú"` hardcoded** en el botón hamburger → nueva clave `aria_menu` + `data-i18n-aria`.
+
+#### Cambios de copy en EN
+- `cond_cadufresh`: `'CaduFresh'` → `'Aging'` (el portmanteau español no se entendía en inglés).
+
+#### Deuda técnica documentada (no crítica)
+- Errores de Supabase (`err.message`) llegan en inglés siempre, sin traducir.
+- `<title>Film Database</title>` estático, no cambia con idioma.
+- `<label>Email</label>` sin `data-i18n` (palabra universal, detalle).
+- Orden de carga: `stocksMeta.js` se carga después de sus consumidores `films.js` / `dashboard.js` (funciona porque `StockChip` sólo se invoca en funciones diferidas).
+- `js/notas.txt` huérfano; `imgs/.DS_Store` debería ir a `.gitignore`.
