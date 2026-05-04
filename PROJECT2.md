@@ -133,11 +133,69 @@ Nuevo módulo en sidebar (abajo de Línea de tiempo). 7 secciones:
 - Botón "Modo avanzado →" en el header del modal reemplaza el body sin cerrar el modal (`switchToAdvanced()`)
 
 ### Áreas de mejora pendientes
-- Página detalle por rollo
 - Exportar CSV
 - Validación fechas (fin < inicio)
 - Sin confirmación al cerrar modal con cambios
 - PWA / offline
+
+---
+
+### Sistema bilingüe ES/EN (commits cafab86 → 8f481db)
+
+Soporte completo de internacionalización. 1 archivo nuevo, 11 modificados.
+
+**Regla:** nunca hardcodear strings — usar `I18n.t('clave')` en JS y `data-i18n="clave"` en HTML estático.
+
+#### Archivo nuevo: `js/i18n.js`
+- IIFE con ~200 claves de traducción en `_T.es` y `_T.en`
+- `t(key, vars)` — traduce con interpolación `{var}`
+- `setLang(lang)` — guarda en localStorage, actualiza DOM, re-renderiza vista activa
+- `apply()` — actualiza `[data-i18n]`, `[data-i18n-placeholder]`, `[data-i18n-aria]`
+- `init()` — lee idioma de localStorage al cargar
+- Debe cargarse **antes** que todos los demás JS
+
+#### Patrones clave
+```js
+// Texto dinámico en JS
+`<button>${I18n.t('modal_save')}</button>`
+
+// Plural
+`${n} ${n !== 1 ? I18n.t('stats_roll_n') : I18n.t('stats_roll_1')}`
+
+// Interpolación
+I18n.t('toast_cameras_imported', { n: data.length })
+
+// Arrays (meses)
+const months = I18n.t('months_short'); // ['Ene','Feb',...] o ['Jan','Feb',...]
+```
+
+#### Cambios clave por módulo
+- **`films.js`**: `statusConfig()` y `typeCfg()` son ahora **funciones** (no constantes) para retornar traducciones frescas. Nueva función `photoTypeLabel(val)` mapea valores DB ('paisaje') a etiquetas traducidas.
+- **`stats.js`** y **`timeline.js`**: eliminado `MONTHS_ES` hardcodeado, ahora usan `I18n.t('months_long')` / `I18n.t('months_short')`.
+- **`app.js`**: títulos de página y tema usan `I18n.t()`.
+- **`auth.js`**: todos los mensajes de error/éxito usan `I18n.t()`.
+
+#### Botones de idioma (🇲🇽 ES / 🇺🇸 EN)
+- **Login**: par de botones debajo del formulario, separados por línea horizontal
+- **Sidebar**: mismo par en el footer, ancho completo
+- El idioma activo se resalta en verde (`.lang-btn.active`)
+
+```html
+<div class="lang-switcher lang-switcher--auth">
+  <button class="lang-btn" data-lang="es" onclick="I18n.setLang('es')">🇲🇽 ES</button>
+  <button class="lang-btn" data-lang="en" onclick="I18n.setLang('en')">🇺🇸 EN</button>
+</div>
+```
+
+#### CSS añadido
+```css
+.lang-switcher { display:flex; gap:.5rem; }
+.lang-switcher--auth { justify-content:center; margin-top:1.25rem; padding-top:1.25rem; border-top:1px solid var(--border); }
+.lang-switcher--sidebar { width:100%; margin-bottom:.25rem; }
+.lang-btn { font-size:.8rem; font-weight:600; padding:.4rem .9rem; border-radius:var(--radius); border:1px solid var(--border); background:var(--card); color:var(--text-muted); cursor:pointer; }
+.lang-btn:hover { border-color:var(--primary); color:var(--primary); }
+.lang-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+```
 
 
 ### CSS / UI
