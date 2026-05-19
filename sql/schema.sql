@@ -3,13 +3,16 @@
 -- Run this in the Supabase SQL Editor
 -- ============================================================
 
+-- Existing DBs: if you already created these tables before Super8 support,
+-- run sql/align_schema_2026_05_19.sql in Supabase first.
+
 -- CAMERAS
 CREATE TABLE IF NOT EXISTS cameras (
   id         UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id    UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   brand      TEXT NOT NULL,
   model      TEXT NOT NULL,
-  format     TEXT NOT NULL CHECK (format IN ('35mm', '120')),
+  format     TEXT NOT NULL CHECK (format IN ('35mm', '120', 'Super8')),
   type       TEXT NOT NULL CHECK (type IN ('p&s', 'SLR', 'TLR', 'Rangefinder')),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -42,7 +45,7 @@ CREATE TABLE IF NOT EXISTS films (
   name           TEXT NOT NULL,
   type           TEXT NOT NULL CHECK (type IN ('color', 'bw', 'slide')),
   iso            INTEGER NOT NULL,
-  format         TEXT NOT NULL CHECK (format IN ('35mm', '120')),
+  format         TEXT NOT NULL CHECK (format IN ('35mm', '120', 'Super8')),
   camera_id      UUID REFERENCES cameras(id) ON DELETE SET NULL,
   lens_id        UUID REFERENCES lenses(id) ON DELETE SET NULL,
   current_status TEXT NOT NULL DEFAULT 'en_camara'
@@ -52,7 +55,7 @@ CREATE TABLE IF NOT EXISTS films (
   notes          TEXT,
   push_pull      TEXT NOT NULL DEFAULT 'no'
                    CHECK (push_pull IN ('no', '+1', '+2', '+3', '-1', '-2')),
-  num_photos     TEXT CHECK (num_photos IN ('12', '24', '36')),
+  num_photos     TEXT CHECK (num_photos IN ('4', '6', '9', '12', '14', '18', '24', '36')),
   lab            TEXT,
   city           TEXT,
   country        TEXT,
