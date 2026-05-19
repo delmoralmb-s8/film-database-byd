@@ -66,6 +66,22 @@ const App = (() => {
   const views = ['dashboard', 'gear', 'films', 'film-detail', 'timeline', 'stats'];
   let currentView = 'dashboard';
 
+  function viewTitles() {
+    return {
+      dashboard:     I18n.t('page_dashboard'),
+      gear:          I18n.t('page_gear'),
+      films:         I18n.t('page_rolls'),
+      'film-detail': I18n.t('page_film_detail'),
+      timeline:      I18n.t('page_timeline'),
+      stats:         I18n.t('page_stats'),
+    };
+  }
+
+  function updateDocumentTitle(view) {
+    const title = viewTitles()[view] || view;
+    document.title = title ? `${title} | Film Database` : 'Film Database';
+  }
+
   function navigate(view) {
     currentView = view;
     sessionStorage.setItem('lastView', view);
@@ -76,15 +92,9 @@ const App = (() => {
     document.querySelectorAll('.nav-link, .bottom-nav-item[data-view]').forEach(link => {
       link.classList.toggle('active', link.dataset.view === navView);
     });
-    const titles = {
-      dashboard:     I18n.t('page_dashboard'),
-      gear:          I18n.t('page_gear'),
-      films:         I18n.t('page_rolls'),
-      'film-detail': I18n.t('page_film_detail'),
-      timeline:      I18n.t('page_timeline'),
-      stats:         I18n.t('page_stats'),
-    };
+    const titles = viewTitles();
     document.getElementById('page-title').textContent = titles[view] || view;
+    updateDocumentTitle(view);
 
     // Close mobile sidebar
     document.getElementById('sidebar').classList.remove('open');
@@ -180,9 +190,10 @@ const Theme = (() => {
 // Bootstrap
 // ============================================================
 
-document.addEventListener('DOMContentLoaded', () => {
+function bootstrapApp() {
   I18n.init();
   I18n.apply();
+  document.title = `${I18n.t('page_auth')} | Film Database`;
   // Mark active lang button on load
   const currentLang = I18n.getLang();
   document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -199,4 +210,14 @@ document.addEventListener('DOMContentLoaded', () => {
   Films.bindUI();
   Auth.bindUI();
   Auth.init();
-});
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrapApp);
+} else {
+  bootstrapApp();
+}

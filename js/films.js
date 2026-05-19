@@ -172,8 +172,16 @@ const Films = (() => {
 
   function getAll() { return films; }
 
+  function validateDates(form) {
+    if (!form.start_date || !form.end_date) return;
+    if (form.end_date < form.start_date) {
+      throw new Error(I18n.t('toast_invalid_dates'));
+    }
+  }
+
   async function save(form) {
     const user = Auth.getUser();
+    validateDates(form);
     const payload = {
       user_id:        user.id,
       film_status:    form.film_status,
@@ -657,17 +665,7 @@ const Films = (() => {
     return `<th class="th-sortable${_sortCol === col ? ' th-active' : ''}" onclick="Films.toggleSort('${col}')">${label} ${_sortIcon(col)}</th>`;
   }
 
-  function formatDatetime(str) {
-    if (!str) return '—';
-    const dateStr = str.includes('T') ? str.split('T')[0] : str;
-    return formatDate(dateStr) || '—';
-  }
-
-  // ---- Render list ----
-
-  async function render() {
-    await load();
-
+  function filteredAndSortedFilms() {
     const fStatus  = document.getElementById('filter-status')?.value || '';
     const fType    = document.getElementById('filter-type')?.value   || '';
     const fFormat  = document.getElementById('filter-format')?.value || '';
@@ -685,6 +683,93 @@ const Films = (() => {
     if (sortFn) {
       list = [...list].sort((a, b) => _sortDir === 'asc' ? sortFn(a, b) : sortFn(b, a));
     }
+    return list;
+  }
+
+  function csvEscape(value) {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    return /[",\n\r]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+  }
+
+  function exportCsv() {
+    const list = filteredAndSortedFilms();
+    if (!list.length) {
+      Toast.show(I18n.t('toast_no_csv_rows'), 'error');
+      return;
+    }
+
+    const headers = [
+      I18n.t('th_added'),
+      I18n.t('th_roll'),
+      I18n.t('form_brand'),
+      I18n.t('th_type'),
+      I18n.t('th_iso'),
+      I18n.t('th_format'),
+      I18n.t('th_camera'),
+      I18n.t('form_lens'),
+      I18n.t('th_status'),
+      I18n.t('form_roll_condition'),
+      I18n.t('form_push_pull'),
+      I18n.t('form_num_photos'),
+      I18n.t('form_start_date'),
+      I18n.t('form_end_date'),
+      I18n.t('th_lab'),
+      I18n.t('form_city'),
+      I18n.t('form_country'),
+      I18n.t('form_photo_type'),
+      I18n.t('th_notes')
+    ].map(h => h.trim());
+
+    const rows = list.map(f => [
+      f.created_at || '',
+      f.name || '',
+      f.brand || '',
+      typeCfg()[f.type]?.label || f.type || '',
+      f.iso || '',
+      f.format || '',
+      cameraName(f),
+      lensName(f),
+      statusConfig()[f.current_status]?.label || f.current_status || '',
+      filmStatusConfig()[f.film_status]?.label || f.film_status || '',
+      f.push_pull || '',
+      f.num_photos || '',
+      f.start_date || '',
+      f.end_date || '',
+      f.lab || '',
+      f.city || '',
+      f.country || '',
+      photoTypeLabel(f.photo_type),
+      f.notes || ''
+    ]);
+
+    const csv = [headers, ...rows]
+      .map(row => row.map(csvEscape).join(','))
+      .join('\n');
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 10);
+    link.href = url;
+    link.download = `film-database-rollos-${stamp}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    Toast.show(I18n.t('toast_csv_exported', { n: list.length }), 'success');
+  }
+
+  function formatDatetime(str) {
+    if (!str) return '—';
+    const dateStr = str.includes('T') ? str.split('T')[0] : str;
+    return formatDate(dateStr) || '—';
+  }
+
+  // ---- Render list ----
+
+  async function render() {
+    await load();
+    const list = filteredAndSortedFilms();
 
     const wrapper = document.querySelector('#films-view .table-wrapper');
     if (!wrapper) return;
@@ -1012,6 +1097,7 @@ const Films = (() => {
     document.getElementById('btn-add-film-list')?.addEventListener('click', () => openModal());
     document.getElementById('btn-add-film-mobile')?.addEventListener('click', () => openModal());
     document.getElementById('btn-add-film-dash')?.addEventListener('click', () => openModal());
+    document.getElementById('btn-export-films')?.addEventListener('click', () => exportCsv());
 
     ['filter-status','filter-type','filter-format'].forEach(id => {
       document.getElementById(id)?.addEventListener('change', () => render());
@@ -1024,7 +1110,7 @@ const Films = (() => {
     onFormatChange, onTypeChange, onBrandChange, onNameChange, onCameraChange,
     onQuickFormatChange, onQuickBrandChange, onQuickNameChange, onQuickCameraChange,
     switchToAdvanced, switchToQuick,
-    remove, confirmDelete, toggleSort,
+    remove, confirmDelete, toggleSort, exportCsv,
     statusBadge, filmStatusBadge, typeBadge, formatDate, photoTypeLabel,
     STATUS_CONFIG: statusConfig,
   };

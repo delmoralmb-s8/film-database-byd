@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Film Database</title>
+  <meta name="theme-color" content="#2f6f4e">
+  <meta name="description" content="Seguimiento de rollos en formato 135, 120 y Super8">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="base.jpeg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -254,7 +258,10 @@
       <section id="films-view" class="view">
         <div class="page-header">
           <h2 data-i18n="nav_rolls">Rollos</h2>
-          <button id="btn-add-film-list" class="btn btn-primary" data-i18n="films_add_btn">+ Añadir rollo</button>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <button id="btn-export-films" class="btn btn-ghost" data-i18n="films_export_csv">Exportar CSV</button>
+            <button id="btn-add-film-list" class="btn btn-primary" data-i18n="films_add_btn">+ Añadir rollo</button>
+          </div>
         </div>
 
         <!-- Filters -->

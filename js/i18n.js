@@ -45,6 +45,7 @@ const I18n = (() => {
 
       // Page titles
       page_dashboard: 'Panel de control',
+      page_auth: 'Iniciar sesión',
       page_gear: 'Gear',
       page_rolls: 'Rollos',
       page_film_detail: 'Detalle del rollo',
@@ -79,6 +80,7 @@ const I18n = (() => {
 
       // Films list
       films_add_btn: '+ Añadir rollo',
+      films_export_csv: 'Exportar CSV',
       filter_all_status: 'Todos los estados',
       filter_in_cam: 'En cámara',
       filter_in_dev: 'Por revelar',
@@ -214,6 +216,9 @@ const I18n = (() => {
       toast_save_error: 'Error al guardar',
       toast_save_roll_error: 'Error al guardar el rollo',
       toast_required: 'Marca y nombre son obligatorios',
+      toast_invalid_dates: 'La fecha fin no puede ser anterior a la fecha inicio.',
+      toast_no_csv_rows: 'No hay rollos para exportar con los filtros actuales.',
+      toast_csv_exported: '{n} rollos exportados a CSV',
       toast_fill_camera: 'Escribe la marca y modelo de tu cámara',
       toast_camera_added: 'Cámara añadida',
       toast_camera_updated: 'Cámara actualizada',
@@ -379,6 +384,7 @@ const I18n = (() => {
 
       // Page titles
       page_dashboard: 'Dashboard',
+      page_auth: 'Sign in',
       page_gear: 'Gear',
       page_rolls: 'Rolls',
       page_film_detail: 'Roll detail',
@@ -413,6 +419,7 @@ const I18n = (() => {
 
       // Films list
       films_add_btn: '+ Add roll',
+      films_export_csv: 'Export CSV',
       filter_all_status: 'All statuses',
       filter_in_cam: 'In camera',
       filter_in_dev: 'To develop',
@@ -548,6 +555,9 @@ const I18n = (() => {
       toast_save_error: 'Error saving',
       toast_save_roll_error: 'Error saving roll',
       toast_required: 'Brand and name are required',
+      toast_invalid_dates: 'End date cannot be earlier than start date.',
+      toast_no_csv_rows: 'No rolls to export with the current filters.',
+      toast_csv_exported: '{n} rolls exported to CSV',
       toast_fill_camera: 'Enter the brand and model of your camera',
       toast_camera_added: 'Camera added',
       toast_camera_updated: 'Camera updated',
@@ -697,6 +707,10 @@ const I18n = (() => {
     apply();
     _updateLangBtns();
     if (typeof Theme !== 'undefined') Theme.refresh();
+    if (document.getElementById('app-screen')?.classList.contains('hidden')) {
+      document.title = `${t('page_auth')} | Film Database`;
+      return;
+    }
     // Re-render active view so all JS-generated text updates
     const activeEl = document.querySelector('.view.active');
     if (activeEl && typeof App !== 'undefined') {
