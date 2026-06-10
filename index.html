@@ -15,6 +15,57 @@
 </head>
 <body>
 
+<!-- SVG icon symbols -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <!-- Panel / dashboard -->
+  <symbol id="icon-dashboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="3" width="7" height="18" rx="1.5"/>
+    <rect x="12" y="3" width="9" height="8" rx="1.5"/>
+    <rect x="12" y="13" width="9" height="8" rx="1.5"/>
+  </symbol>
+  <!-- Film canister with leader strip -->
+  <symbol id="icon-film" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2.5" y="2.5" width="12" height="2.5" rx="0.5"/>
+    <rect x="2.5" y="19" width="12" height="2.5" rx="0.5"/>
+    <rect x="3.5" y="5" width="10" height="14" rx="0.5"/>
+    <path d="M13.5 9.5 H19 V16.5 H13.5"/>
+    <rect x="16" y="11" width="1.5" height="1.5" rx="0.2" fill="currentColor" stroke="none"/>
+    <rect x="16" y="13.5" width="1.5" height="1.5" rx="0.2" fill="currentColor" stroke="none"/>
+  </symbol>
+  <!-- Super 8 camera -->
+  <symbol id="icon-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="7.5" y="2" width="6" height="2.5" rx="0.5"/>
+    <rect x="2" y="4.5" width="16" height="10.5" rx="1.5"/>
+    <line x1="2" y1="10" x2="18" y2="10"/>
+    <rect x="18" y="6.5" width="4" height="6" rx="0.5"/>
+    <line x1="21" y1="7" x2="21" y2="12"/>
+    <path d="M5 15 L5 21 Q5 22.5 6.5 22.5 L11.5 22.5 Q13 22.5 13 21 L13 15"/>
+  </symbol>
+  <!-- Timeline: clock + line with dots and arrow -->
+  <symbol id="icon-timeline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="7" r="4.5"/>
+    <polyline points="12,5 12,7 13.5,7"/>
+    <line x1="2" y1="18" x2="18" y2="18"/>
+    <polyline points="16,15.5 19,18 16,20.5"/>
+    <circle cx="5" cy="18" r="1.7" fill="currentColor" stroke="none"/>
+    <circle cx="10" cy="18" r="1.7" fill="currentColor" stroke="none"/>
+    <circle cx="15" cy="18" r="1.7" fill="currentColor" stroke="none"/>
+  </symbol>
+  <!-- Stats: bar chart + line graph overlay -->
+  <symbol id="icon-stats" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="3" y1="20" x2="21" y2="20"/>
+    <line x1="6" y1="20" x2="6" y2="16"/>
+    <line x1="11" y1="20" x2="11" y2="10"/>
+    <line x1="16" y1="20" x2="16" y2="14"/>
+    <line x1="20" y1="20" x2="20" y2="7"/>
+    <polyline points="6,16 11,10 16,14 20,7"/>
+    <circle cx="6" cy="16" r="2" fill="currentColor" stroke="none"/>
+    <circle cx="11" cy="10" r="2" fill="currentColor" stroke="none"/>
+    <circle cx="16" cy="14" r="2" fill="currentColor" stroke="none"/>
+    <circle cx="20" cy="7" r="2" fill="currentColor" stroke="none"/>
+  </symbol>
+</svg>
+
 <!-- ============================================================
      AUTH SCREEN
      ============================================================ -->
@@ -86,19 +137,19 @@
     </div>
     <div class="sidebar-nav">
       <button class="nav-link active" data-view="dashboard">
-        <span class="nav-icon">&#128202;</span> <span data-i18n="nav_dashboard">Panel</span>
+        <span class="nav-icon"><svg aria-hidden="true"><use href="#icon-dashboard"/></svg></span> <span data-i18n="nav_dashboard">Panel</span>
       </button>
       <button class="nav-link" data-view="films">
-        <span class="nav-icon">&#127902;</span> <span data-i18n="nav_rolls">Rollos</span>
+        <span class="nav-icon"><svg aria-hidden="true"><use href="#icon-film"/></svg></span> <span data-i18n="nav_rolls">Rollos</span>
       </button>
       <button class="nav-link" data-view="gear">
-        <span class="nav-icon">&#9881;</span> <span data-i18n="nav_gear">Gear</span>
+        <span class="nav-icon"><svg aria-hidden="true"><use href="#icon-camera"/></svg></span> <span data-i18n="nav_gear">Gear</span>
       </button>
       <button class="nav-link" data-view="timeline">
-        <span class="nav-icon">&#128338;</span> <span data-i18n="nav_timeline">Línea de tiempo</span>
+        <span class="nav-icon"><svg aria-hidden="true"><use href="#icon-timeline"/></svg></span> <span data-i18n="nav_timeline">Línea de tiempo</span>
       </button>
       <button class="nav-link" data-view="stats">
-        <span class="nav-icon">&#128202;</span> <span data-i18n="nav_stats">Estadísticas</span>
+        <span class="nav-icon"><svg aria-hidden="true"><use href="#icon-stats"/></svg></span> <span data-i18n="nav_stats">Estadísticas</span>
       </button>
       <button id="btn-add-film" class="btn btn-primary" style="margin-top:.75rem;width:100%;justify-content:center">
         <span data-i18n="nav_add_roll">+ Agregar nuevo rollo</span>
@@ -305,19 +356,19 @@
   <!-- Bottom nav (mobile only) -->
   <nav id="bottom-nav" class="bottom-nav">
     <button class="bottom-nav-item active" data-view="dashboard">
-      <span class="bnav-icon">&#128202;</span><span class="nav-label" data-i18n="nav_dashboard">Panel</span>
+      <span class="bnav-icon"><svg aria-hidden="true"><use href="#icon-dashboard"/></svg></span><span class="nav-label" data-i18n="nav_dashboard">Panel</span>
     </button>
     <button class="bottom-nav-item" data-view="films">
-      <span class="bnav-icon">&#127926;</span><span class="nav-label" data-i18n="nav_rolls">Rollos</span>
+      <span class="bnav-icon"><svg aria-hidden="true"><use href="#icon-film"/></svg></span><span class="nav-label" data-i18n="nav_rolls">Rollos</span>
     </button>
     <button class="bottom-nav-item bottom-nav-add" id="btn-add-film-mobile">
       <span class="bottom-nav-plus">+</span>
     </button>
     <button class="bottom-nav-item" data-view="gear">
-      <span class="bnav-icon">&#9881;</span><span class="nav-label" data-i18n="nav_gear">Gear</span>
+      <span class="bnav-icon"><svg aria-hidden="true"><use href="#icon-camera"/></svg></span><span class="nav-label" data-i18n="nav_gear">Gear</span>
     </button>
     <button class="bottom-nav-item" data-view="timeline">
-      <span class="bnav-icon">&#128338;</span><span class="nav-label" data-i18n="nav_timeline">Timeline</span>
+      <span class="bnav-icon"><svg aria-hidden="true"><use href="#icon-timeline"/></svg></span><span class="nav-label" data-i18n="nav_timeline">Timeline</span>
     </button>
   </nav>
 

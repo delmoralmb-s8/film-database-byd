@@ -365,6 +365,8 @@ a:hover { color: var(--primary-h); }
 }
 
 .nav-link .nav-icon { font-size: 1rem; width: 1.2rem; text-align: center; }
+.nav-icon svg { width: 1.1rem; height: 1.1rem; display: inline-block; vertical-align: -0.15em; }
+.bnav-icon svg { width: 1.4rem; height: 1.4rem; display: block; margin: 0 auto; }
 
 .sidebar-footer {
   padding: .75rem .6rem;
