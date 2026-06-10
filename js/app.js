@@ -161,6 +161,10 @@ const Theme = (() => {
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
     document.getElementById('theme-label').textContent = dark ? I18n.t('theme_light') : I18n.t('theme_dark');
     document.getElementById('theme-icon').textContent  = dark ? '☀️' : '🌙';
+    const authIcon  = document.getElementById('theme-icon-auth');
+    const authLabel = document.getElementById('theme-label-auth');
+    if (authIcon)  authIcon.textContent  = dark ? '☀️' : '🌙';
+    if (authLabel) authLabel.textContent = dark ? I18n.t('theme_light') : I18n.t('theme_dark');
   }
 
   function init() {
@@ -176,6 +180,8 @@ const Theme = (() => {
 
   function bindUI() {
     document.getElementById('btn-theme').addEventListener('click', toggle);
+    const authBtn = document.getElementById('btn-theme-auth');
+    if (authBtn) authBtn.addEventListener('click', toggle);
   }
 
   function refresh() {
