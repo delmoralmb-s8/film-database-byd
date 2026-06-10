@@ -96,6 +96,15 @@ a:hover { color: var(--primary-h); }
   margin-bottom: 2rem;
 }
 
+.auth-logo-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  display: block;
+  margin: 0 auto .75rem;
+  color: var(--primary);
+  stroke: var(--primary);
+}
+
 .auth-logo h1 {
   font-size: 1.5rem;
   font-weight: 700;
